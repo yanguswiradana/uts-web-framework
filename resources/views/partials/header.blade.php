@@ -11,9 +11,9 @@
             </div>
 
             <nav class="hidden md:flex space-x-8 lg:space-x-12">
-                <a href="#" class="text-white hover:text-purple-500 font-medium text-lg transition duration-200 border-b-2 border-transparent hover:border-purple-500 pb-1">Home</a>
-                <a href="#" class="text-gray-400 hover:text-purple-500 font-medium text-lg transition duration-200 border-b-2 border-transparent hover:border-purple-500 pb-1">Explore</a>
-                <a href="#" class="text-gray-400 hover:text-purple-500 font-medium text-lg transition duration-200 border-b-2 border-transparent hover:border-purple-500 pb-1">Library</a>
+                <a href="/" class="text-white hover:text-purple-500 font-medium text-lg transition duration-200 border-b-2 border-transparent hover:border-purple-500 pb-1">Home</a>
+                <a href="explore" class="text-gray-400 hover:text-purple-500 font-medium text-lg transition duration-200 border-b-2 border-transparent hover:border-purple-500 pb-1">Explore</a>
+                <a href="library" class="text-gray-400 hover:text-purple-500 font-medium text-lg transition duration-200 border-b-2 border-transparent hover:border-purple-500 pb-1">Library</a>
             </nav>
 
             <div class="flex items-center space-x-4">
