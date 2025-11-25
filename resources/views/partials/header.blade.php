@@ -5,15 +5,14 @@
             <div class="flex items-center">
                 <a href="/" class="flex items-center space-x-2">
 
-                    <img src="/images/komikin-logo.png" alt="KOMIKIN Logo" class="h-8 w-auto">
-                    <span class="text-3xl font-extrabold text-purple-500 hidden sm:inline">KOMIKIN</span>
+                    <img src="{{ asset("images/komikin-logo.png") }}" alt="KOMIKIN Logo" class="" height="150px" width="150px">
                 </a>
             </div>
 
             <nav class="hidden md:flex space-x-8 lg:space-x-12">
-                <a href="#" class="text-white hover:text-purple-500 font-medium text-lg transition duration-200 border-b-2 border-transparent hover:border-purple-500 pb-1">Home</a>
-                <a href="#" class="text-gray-400 hover:text-purple-500 font-medium text-lg transition duration-200 border-b-2 border-transparent hover:border-purple-500 pb-1">Explore</a>
-                <a href="#" class="text-gray-400 hover:text-purple-500 font-medium text-lg transition duration-200 border-b-2 border-transparent hover:border-purple-500 pb-1">Library</a>
+                <a href="/" class="text-white hover:text-purple-500 font-medium text-lg transition duration-200 border-b-2 border-transparent hover:border-purple-500 pb-1">Home</a>
+                <a href="explore" class="text-gray-400 hover:text-purple-500 font-medium text-lg transition duration-200 border-b-2 border-transparent hover:border-purple-500 pb-1">Explore</a>
+                <a href="library" class="text-gray-400 hover:text-purple-500 font-medium text-lg transition duration-200 border-b-2 border-transparent hover:border-purple-500 pb-1">Library</a>
             </nav>
 
             <div class="flex items-center space-x-4">
