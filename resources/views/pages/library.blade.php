@@ -4,51 +4,9 @@
 
 @section('content')
 
-<?php
-// Data Dummy Library
-// Catatan: Saya ubah 'image_html' menjadi 'image_url' agar kita bisa styling tag <img> nya langsung (zoom, rounded, dll)
-$favoriteComics = [
-    [
-        'title' => 'Bones', 
-        'chapter' => 30, 
-        'type' => 'Manhwa',
-        'image_url' => asset('images/bones.jpg')
-    ],
-    [
-        'title' => 'Star Ginseng Store', 
-        'chapter' => 186, 
-        'type' => 'Manhwa',
-        'image_url' => asset('images/star_ginseng_store.jpg')
-    ],
-    [
-        'title' => 'My Bias Gets On The Last Train', 
-        'chapter' => 54, 
-        'type' => 'Manhwa',
-        'image_url' => asset('images/my bias gets on the last train.jpg')
-    ],
-    [
-        'title' => 'Pick Me Up', 
-        'chapter' => 176, 
-        'type' => 'Manhwa',
-        'image_url' => asset('images/pick_me_up.jpg')
-    ],
-    [
-        'title' => 'Nano Machine', 
-        'chapter' => 287, 
-        'type' => 'Manhwa',
-        'image_url' => asset('images/nano_machine.jpg')
-    ],
-    [
-        'title' => 'Reality Quest', 
-        'chapter' => 179, 
-        'type' => 'Manhwa',
-        'image_url' => asset('images/reality_quest.jpg')
-    ],
-];
-?>
-
 <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-10 min-h-screen">
 
+    {{-- Header Section --}}
     <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 border-b border-gray-800 pb-6">
         <div>
             <h1 class="text-3xl font-extrabold text-white flex items-center">
@@ -70,28 +28,36 @@ $favoriteComics = [
         </div>
     </div>
 
+    {{-- Grid Content --}}
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-5 gap-y-10">
 
         @foreach ($favoriteComics as $comic)
         <div class="group relative cursor-pointer">
             
+            {{-- Link Wrapper --}}
             <a href="/comic/{{ Str::slug($comic['title']) }}" class="block">
                 
+                {{-- Cover Image Wrapper --}}
                 <div class="relative aspect-[3/4] rounded-xl overflow-hidden bg-gray-900 shadow-md transition-all duration-300 group-hover:shadow-purple-500/40 group-hover:-translate-y-1">
                     
+                    {{-- Badge Type --}}
                     <div class="absolute top-0 left-0 z-10 bg-purple-600/90 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-1 rounded-br-lg shadow-sm">
                         {{ $comic['type'] ?? 'Manhwa' }}
                     </div>
 
-                    <img src="{{ $comic['image_url'] ?? 'https://via.placeholder.com/300x400' }}" 
+                    {{-- Image: Perhatikan penggunaan asset() disini --}}
+                    <img src="{{ asset($comic['image_path']) }}" 
                          alt="{{ $comic['title'] }}" 
-                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                         onerror="this.src='https://via.placeholder.com/300x400?text=No+Image'">
                     
+                    {{-- Gradient Overlay --}}
                     <div class="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-gray-900/60 to-transparent pointer-events-none"></div>
 
                 </div>
             </a>
 
+            {{-- Comic Info --}}
             <div class="mt-3 px-1">
                 <a href="/comic/{{ Str::slug($comic['title']) }}" class="group-hover:text-purple-400 transition-colors duration-200">
                     <h3 class="text-gray-100 font-bold text-[15px] leading-snug line-clamp-1" title="{{ $comic['title'] }}">
@@ -116,6 +82,7 @@ $favoriteComics = [
 
     </div>
 
+    {{-- Empty State --}}
     @if(empty($favoriteComics))
     <div class="flex flex-col items-center justify-center py-20 text-center">
         <div class="w-24 h-24 bg-gray-800 rounded-full flex items-center justify-center mb-4">
@@ -123,7 +90,7 @@ $favoriteComics = [
         </div>
         <h3 class="text-xl text-white font-bold">Belum ada Favorit</h3>
         <p class="text-gray-500 mt-2 max-w-sm">Tandai komik yang kamu suka agar mudah ditemukan di sini.</p>
-        <a href="/" class="mt-6 px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-semibold transition">
+        <a href="{{ route('explore.index') }}" class="mt-6 px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-semibold transition">
             Jelajahi Sekarang
         </a>
     </div>
