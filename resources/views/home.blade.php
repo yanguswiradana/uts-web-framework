@@ -60,6 +60,7 @@
                 @endfor
             </div>
 
+            
             <div class="flex justify-center items-center space-x-2 mt-10">
                 <a href="#" class="py-2 px-3 border border-gray-700 rounded-lg text-gray-400 hover:bg-gray-800 transition duration-150 disabled:opacity-50 text-sm">
                     &laquo; Prev
