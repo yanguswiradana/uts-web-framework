@@ -5,8 +5,7 @@
             <div class="flex items-center">
                 <a href="/" class="flex items-center space-x-2">
 
-                    <img src="/images/komikin-logo.png" alt="KOMIKIN Logo" class="h-8 w-auto">
-                    <span class="text-3xl font-extrabold text-purple-500 hidden sm:inline">KOMIKIN</span>
+                    <img src="{{ asset("images/komikin-logo.png") }}" alt="KOMIKIN Logo" class="" height="150px" width="150px">
                 </a>
             </div>
 
