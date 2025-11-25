@@ -12,24 +12,110 @@ class KomikController extends Controller
 {
     /**
      * PRIVATE METHOD: PUSAT DATA (SINGLE SOURCE OF TRUTH)
-     * Semua data komik (Home, Explore, Library, Detail) diambil dari sini.
      */
     private function getComicData()
     {
         $rawComics = [
             // --- DATA DARI HOME/EXPLORE ---
-            ['title' => 'Omniscient Reader’s Viewpoint', 'type' => 'Manhwa', 'chapters' => 289, 'genre' => 'Fantasy, System, Adventure', 'status' => 'Ongoing', 'rating' => 9.8, 'cover' => 'images/orv.jpg'],
-            ['title' => 'Infinite Mage', 'type' => 'Manhwa', 'chapters' => 145, 'genre' => 'Action, Fantasy, Magic', 'status' => 'Ongoing', 'rating' => 9.2, 'cover' => 'images/infinite_mage.jpg'],
-            ['title' => 'Nano Machine', 'type' => 'Manhwa', 'chapters' => 287, 'genre' => 'Murim, System, Supernatural', 'status' => 'Ongoing', 'rating' => 9.5, 'cover' => 'images/nano_machine.jpg'],
-            ['title' => 'Pick Me Up', 'type' => 'Manhwa', 'chapters' => 176, 'genre' => 'Comedy, Action, Adventure', 'status' => 'Ongoing', 'rating' => 9.7, 'cover' => 'images/pick_me_up.jpg'],
-            ['title' => 'Reality Quest', 'type' => 'Manhwa', 'chapters' => 179, 'genre' => 'Action, Fantasy, System', 'status' => 'Ongoing', 'rating' => 9.1, 'cover' => 'images/reality_quest.jpg'],
-            ['title' => 'The World After The Fall', 'type' => 'Manhwa', 'chapters' => 209, 'genre' => 'Adventure, Fantasy, Action', 'status' => 'Ongoing', 'rating' => 9.2, 'cover' => 'images/World_after_the_fall.jpg'],
-            ['title' => 'Return of the Mount Hua Sect', 'type' => 'Manhwa', 'chapters' => 152, 'genre' => 'Murim, Action, Comedy', 'status' => 'Ongoing', 'rating' => 9.9, 'cover' => 'images/return_of_the_mount_hua_sect.jpg'],
+            [
+                'title' => 'Omniscient Reader’s Viewpoint',
+                'type' => 'Manhwa',
+                'chapters' => 289,
+                'genre' => 'Fantasy, System, Adventure',
+                'status' => 'Ongoing',
+                'rating' => 9.8,
+                'cover' => 'images/orv.jpg',
+                // CONTOH 1: Sinopsis Manual
+                'synopsis' => 'Kim Dokja hanyalah seorang karyawan biasa yang hobinya membaca novel web favoritnya, "Tiga Cara Bertahan Hidup di Dunia yang Hancur". Namun, saat novel itu tamat, dunia nyata tiba-tiba berubah menjadi skenario mematikan persis seperti di dalam cerita.'
+            ],
+            [
+                'title' => 'Infinite Mage',
+                'type' => 'Manhwa',
+                'chapters' => 145,
+                'genre' => 'Action, Fantasy, Magic',
+                'status' => 'Ongoing',
+                'rating' => 9.2,
+                'cover' => 'images/infinite_mage.jpg',
+                'synopsis' => 'Seorang anak laki-laki biasa yang bercita-cita menjadi penyihir terhebat. Dia menemukan bahwa dia memiliki bakat luar biasa dalam sihir yang melampaui akal sehat.'
+            ],
+            [
+                'title' => 'Nano Machine',
+                'type' => 'Manhwa',
+                'chapters' => 287,
+                'genre' => 'Murim, System, Supernatural',
+                'status' => 'Ongoing',
+                'rating' => 9.5,
+                'cover' => 'images/nano_machine.jpg',
+                'synopsis' => 'Cheon Yeo-Woon, seorang anak haram dari Sekte Iblis yang dihina, tiba-tiba didatangi oleh keturunannya dari masa depan yang memasukkan Nano Machine ke dalam tubuhnya, mengubah nasibnya selamanya.'
+            ],
+            [
+                'title' => 'Pick Me Up',
+                'type' => 'Manhwa',
+                'chapters' => 176,
+                'genre' => 'Comedy, Action, Adventure',
+                'status' => 'Ongoing',
+                'rating' => 9.7,
+                'cover' => 'images/pick_me_up.jpg'
+                // Jika tidak ada 'synopsis', akan pakai default
+            ],
+            [
+                'title' => 'Reality Quest',
+                'type' => 'Manhwa',
+                'chapters' => 179,
+                'genre' => 'Action, Fantasy, System',
+                'status' => 'Ongoing',
+                'rating' => 9.1,
+                'cover' => 'images/reality_quest.jpg'
+            ],
+            [
+                'title' => 'The World After The Fall',
+                'type' => 'Manhwa',
+                'chapters' => 209,
+                'genre' => 'Adventure, Fantasy, Action',
+                'status' => 'Ongoing',
+                'rating' => 9.2,
+                'cover' => 'images/World_after_the_fall.jpg'
+            ],
+            [
+                'title' => 'Return of the Mount Hua Sect',
+                'type' => 'Manhwa',
+                'chapters' => 152,
+                'genre' => 'Murim, Action, Comedy',
+                'status' => 'Ongoing',
+                'rating' => 9.9,
+                'cover' => 'images/return_of_the_mount_hua_sect.jpg',
+                'synopsis' => 'Chung Myung, Sang Saint Pedang Bunga Plum, mengalahkan Cheon Ma namun tewas. Dia terbangun 100 tahun kemudian dalam tubuh anak pengemis, dan mendapati sekte Mount Hua telah runtuh.'
+            ],
 
             // --- DATA TAMBAHAN DARI LIBRARY KAMU ---
-            ['title' => 'Bones', 'type' => 'Manhwa', 'chapters' => 30, 'genre' => 'Action, Gore, Thriller', 'status' => 'Ongoing', 'rating' => 8.8, 'cover' => 'images/bones.jpg'],
-            ['title' => 'Star Ginseng Store', 'type' => 'Manhwa', 'chapters' => 186, 'genre' => 'Drama, Slice of Life', 'status' => 'Ongoing', 'rating' => 8.5, 'cover' => 'images/star_ginseng_store.jpg'],
-            ['title' => 'My Bias Gets On The Last Train', 'type' => 'Manhwa', 'chapters' => 54, 'genre' => 'Romance, Fantasy', 'status' => 'Ongoing', 'rating' => 8.7, 'cover' => 'images/mykisah.jpg'],
+            [
+                'title' => 'Bones',
+                'type' => 'Manhwa',
+                'chapters' => 30,
+                'genre' => 'Action, Gore, Thriller',
+                'status' => 'Ongoing',
+                'rating' => 8.8,
+                'cover' => 'images/bones.jpg',
+                'synopsis' => 'Jihyun, seorang Hunter yang ingin melindungi ibunya, tewas dalam Dungeon. Namun dia bangkit kembali sebagai tengkorak (Skeleton) dan memulai evolusinya untuk menjadi yang terkuat.'
+            ],
+            [
+                'title' => 'Star Ginseng Store',
+                'type' => 'Manhwa',
+                'chapters' => 186,
+                'genre' => 'Drama, Slice of Life',
+                'status' => 'Ongoing',
+                'rating' => 8.5,
+                'cover' => 'images/star_ginseng_store.jpg'
+            ],
+            [
+                'title' => 'My Bias Gets On The Last Train',
+                'type' => 'Manhwa',
+                'chapters' => 54,
+                'genre' => 'Romance, Fantasy',
+                'status' => 'Ongoing',
+                'rating' => 8.7,
+                'cover' => 'images/mykisah.jpg'
+            ],
 
             // --- DATA DUMMY MANGA/MANHUA ---
             ['title' => 'One Piece', 'type' => 'Manga', 'chapters' => 1100, 'genre' => 'Adventure, Action', 'status' => 'Ongoing', 'rating' => 9.9, 'cover' => 'https://via.placeholder.com/300x400?text=One+Piece'],
@@ -46,10 +132,15 @@ class KomikController extends Controller
                 $data['cover'] = 'https://via.placeholder.com/300x400/1f2937/FFFFFF?text=No+Cover';
             }
 
+            // --- LOGIKA SINOPSIS (MODIFIKASI DI SINI) ---
+            // Gunakan operator '??' (Null Coalescing)
+            // Jika key 'synopsis' ada di array data, pakai itu.
+            // Jika tidak ada, pakai kalimat default.
+            $finalSynopsis = $data['synopsis'] ?? "Sinopsis default untuk komik " . $data['title'] . ". Cerita seru yang wajib kamu baca! Ikuti petualangan karakter utama dalam menghadapi berbagai rintangan.";
+
             return array_merge($data, [
                 'slug' => $slug,
-                // Default synopsis jika belum ada
-                'synopsis' => "Sinopsis default untuk komik " . $data['title'] . ". Cerita seru yang wajib kamu baca!"
+                'synopsis' => $finalSynopsis // Masukkan hasil seleksi sinopsis ke data akhir
             ]);
         });
     }
@@ -115,14 +206,13 @@ class KomikController extends Controller
         return view('pages.explore', compact('paginatedComics', 'allGenres', 'selectedGenres', 'selectedStatus', 'searchTerm', 'sortBy'));
     }
 
-    // --- 3. HALAMAN LIBRARY (BARU) ---
+    // --- 3. HALAMAN LIBRARY ---
     public function library(Request $request)
     {
         $allComics = $this->getComicData();
         $searchTerm = $request->input('search');
 
         // DAFTAR JUDUL FAVORIT (Simulasi Database User Favorites)
-        // Kita hanya mengambil data yang judulnya ada di list ini
         $myFavoriteTitles = [
             'Bones',
             'Star Ginseng Store',
@@ -157,7 +247,7 @@ class KomikController extends Controller
             abort(404);
         }
 
-        // Dummy Chapters
+        // Dummy Chapters (List)
         $chapters = [];
         $totalChapters = $comic['chapters'];
         for ($i = $totalChapters; $i >= 1; $i--) {
@@ -173,5 +263,29 @@ class KomikController extends Controller
         $latestChapters = array_slice($chapters, 0, 12);
 
         return view('pages.detail', compact('comic', 'chapters', 'latestChapters'));
+    }
+
+    // --- 5. HALAMAN BACA CHAPTER (VIEWER) ---
+    public function read($slug, $chapterNumber)
+    {
+        $allComics = $this->getComicData();
+        $comic = $allComics->firstWhere('slug', $slug);
+
+        if (!$comic) {
+            abort(404);
+        }
+
+        // Dummy Images untuk Reader
+        $chapterImages = [];
+        $totalImages = rand(10, 15);
+        for ($i = 1; $i <= $totalImages; $i++) {
+            $bgColor = dechex(rand(0x1f1f1f, 0x3f3f3f));
+            $chapterImages[] = "https://via.placeholder.com/800x1200/{$bgColor}/FFFFFF?text=Chapter+{$chapterNumber}+-+Image+{$i}";
+        }
+
+        $prevChapter = ($chapterNumber > 1) ? $chapterNumber - 1 : null;
+        $nextChapter = ($chapterNumber < $comic['chapters']) ? $chapterNumber + 1 : null;
+
+        return view('pages.read', compact('comic', 'chapterNumber', 'chapterImages', 'prevChapter', 'nextChapter'));
     }
 }
