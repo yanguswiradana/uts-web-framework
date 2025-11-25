@@ -55,7 +55,12 @@ class KomikController extends Controller
                 'genre' => 'Comedy, Action, Adventure',
                 'status' => 'Ongoing',
                 'rating' => 9.7,
-                'cover' => 'images/pick_me_up.jpg'
+                'cover' => 'images/pick_me_up.jpg',
+                'synopsis' => 'Dalam game gacha yang terkenal dengan kesulitannya yang mengerikan Master peringkat ke5 di dunia Loki kehilangan kesadaran saat menyerbu Dungeon
+                                Apa Aku karakter game sekarang
+                                Setelah bangun Loki menyadari bahwa dia telah berubah menjadi Pahlawan Level 1 Bintang 1Han Yslat Untuk kembali ke Bumi dia harus memimpin para master dan hero pemula dan membersihkan lantai 100 Dungeon
+                                Kau macammacam dengan orang yang salah
+                                Ini adalah kisah perjuangan keras Master Loki yang belum pernah mengalami satu kekalahan pun'
                 // Jika tidak ada 'synopsis', akan pakai default
             ],
             [
@@ -65,7 +70,8 @@ class KomikController extends Controller
                 'genre' => 'Action, Fantasy, System',
                 'status' => 'Ongoing',
                 'rating' => 9.1,
-                'cover' => 'images/reality_quest.jpg'
+                'cover' => 'images/reality_quest.jpg',
+                'synopsis' => 'Karena ancaman pengganggu sekolah untuk memberinya item game Ha Dowan shuttle game yang tidak beruntung meninggal setelah bermain game sepanjang malam selama seminggu Saat dia meninggal dia dibangkitkan kembali ke ruang kelas satu minggu sebelum dia meninggal Semuanya sama seperti hari itu Satusatunya hal yang berubah adalah mengambang di depannya Apa Gunakan keterampilan permainan yang saya mainkan sejauh ini untuk mengalahkan pengganggu'
             ],
             [
                 'title' => 'The World After The Fall',
@@ -74,7 +80,15 @@ class KomikController extends Controller
                 'genre' => 'Adventure, Fantasy, Action',
                 'status' => 'Ongoing',
                 'rating' => 9.2,
-                'cover' => 'images/World_after_the_fall.jpg'
+                'cover' => 'images/World_after_the_fall.jpg',
+                'synopsis' => 'Manusia tibatiba dipanggil untuk menjadi Walkers dan mereka perlu menyelesaikan menara untuk menyelamatkan dunia
+                            Kemudian Regression Stone ditemukan sekarang Walkers bisa kembali ke masa lalu
+                            Dan perlahanlahan semua orang pergi Jika aku pergi ke masa lalu lalu bagaimana dengan nasib orangorang di dunia ini
+                            Siapa yang akan menyelamatkan mereka
+                            Harapan terakhir umat manusia kelompok Carpe Diem
+                            dibentuk oleh orangorang yang menolak untuk meninggalkan dunia
+                            Tapi begitu Walker terakhir mencapai lantai 100 dia tidak tahu lagi apa yg harus dia percayai
+                            Ini adalah kisah tentang satusatunya pria yang pantang mundur untuk meninggalkan dunianya meskipun semua walker yang lain kembali ke masa lalu'
             ],
             [
                 'title' => 'Return of the Mount Hua Sect',
@@ -102,10 +116,11 @@ class KomikController extends Controller
                 'title' => 'Star Ginseng Store',
                 'type' => 'Manhwa',
                 'chapters' => 186,
-                'genre' => 'Drama, Slice of Life',
+                'genre' => 'Drama, Slice of Life, Romance',
                 'status' => 'Ongoing',
                 'rating' => 8.5,
-                'cover' => 'images/star_ginseng_store.jpg'
+                'cover' => 'images/star_ginseng_store.jpg',
+                'synopsis' => ' Menceritakan tentang Ji Suwon, seorang siswa baru SMA biasa yang memiliki bakat menggambar. Ia jatuh cinta pada seorang gadis yang sudah punya pacar, tetapi kemudian bertemu Seol Hyorim, gadis tercantik di sekolah, dan langsung jatuh cinta padanya. Ia menggambar gadis itu secara diam-diam, tetapi gambarnya ditemukan oleh Yang Jinsu dan diperlihatkan kepada Seol Hyorim. Apakah cinta pertama Suwon yang kedua dapat dipertahankan?'
             ],
             [
                 'title' => 'My Bias Gets On The Last Train',
@@ -114,14 +129,50 @@ class KomikController extends Controller
                 'genre' => 'Romance, Fantasy',
                 'status' => 'Ongoing',
                 'rating' => 8.7,
-                'cover' => 'images/mykisah.jpg'
+                'cover' => 'images/mykisah.jpg',
+                'synopsis' =>'“Lagi-lagi aku bertemu dengannya di kereta terakhir. Andai saja aku bisa berbicara dengannya!” Yeo-un, seorang mahasiswa yang bekerja hingga larut malam dan naik kereta terakhir setiap malamnya.
+                                Ia setiap saat selalu bertemu dengan Shin Haein, seorang wanita yang membawa gitar di sana.
+                                Seolah untaian benang takdir bermain, keduanya terus bertemu dan pada akhirnya menyadari artis favorit mereka sama, musisi indie “Long Afternoon.” Lambat laun, mereka menjadi lebih dekat dan dimulailah kisah ini.'
             ],
-
-            // --- DATA DUMMY MANGA/MANHUA ---
-            ['title' => 'One Piece', 'type' => 'Manga', 'chapters' => 1100, 'genre' => 'Adventure, Action', 'status' => 'Ongoing', 'rating' => 9.9, 'cover' => 'https://via.placeholder.com/300x400?text=One+Piece'],
-            ['title' => 'Jujutsu Kaisen', 'type' => 'Manga', 'chapters' => 250, 'genre' => 'Action, Supernatural', 'status' => 'Ongoing', 'rating' => 9.4, 'cover' => 'https://via.placeholder.com/300x400?text=JJK'],
-            ['title' => 'Magic Emperor', 'type' => 'Manhua', 'chapters' => 500, 'genre' => 'Cultivation, Action', 'status' => 'Ongoing', 'rating' => 9.5, 'cover' => 'https://via.placeholder.com/300x400?text=Magic+Emperor'],
-            ['title' => 'Tales of Demons and Gods', 'type' => 'Manhua', 'chapters' => 450, 'genre' => 'Cultivation, Fantasy', 'status' => 'Ongoing', 'rating' => 9.0, 'cover' => 'https://via.placeholder.com/300x400?text=Tales+Demons'],
+            [
+                'title'=> 'One Piece',
+                'type'=> 'Manga',
+                'chapters'=> '1166',
+                'genre'=> 'Adventure, Action',
+                'status'=> 'Ongoing',
+                'rating'=> '9.9',
+                'cover'=> 'images/one_piece.jpg',
+                'synopsis'=> 'Bercerita tentang seorang lakilaki bernama Monkey D Luffy yang menentang arti dari gelar bajak laut Daripada kesannama besar kejahatan kekerasan dia lebih terlihat seperti bajak laut rendahan yang suka bersenangsenang alasanLuffy menjadi bajak laut adalah tekadnya untuk berpetualang di lautan yang menyenangkan dan bertemu orangorangbaru dan menarik sertabersamasama mencari One Piece'
+            ],
+            [
+                'title' => 'Jujutsu Kaisen',
+                'type' => 'Manga',
+                'chapters' => 271,
+                'genre' => 'Action, Supernatural',
+                'status' => 'Completed',
+                'rating' => 9.4,
+                'cover' => 'images/jjk.jpg',
+                'synopsis'=> 'Yuuji adalah seorang jenius di jalur dan lapangan Tapi dia memiliki minat nol dia senang sebagai clam di Klub Penelitian Ilmu Ghaib Meskipun Dia di Klub hanya untuk Iseng Halhal menjadi serius ketika semangat nyata muncul di sekolah Hidup akan menjadi sangat aneh Di SMA Sugisawa 3'
+            ],
+            [
+                'title' => 'Magic Emperor',
+                'type' => 'Manhua',
+                'chapters' => 783, 
+                'genre' => 'Cultivation, Action', 
+                'status' => 'Ongoing', 'rating' => 9.5, 
+                'cover' => 'images/magic_emperor.jpg',
+                'synopsis'=> 'Karena dia memiliki warisan Ancient Demonic emperor Demonic Emperor Zhuo Yifan menemui nasib sial karena dikhianati dan dibunuh oleh murid kepercayaannya Setelah terlahir kembali kultivasinya kembali ke nol dan dia terjebak oleh heart demon tidak diberi pilihan selain menjadi pengurus rumah tangga dari satusatunya nona tertua Keluarga Luo Dari menjadi Demonic Emperor menjadi pengurus rumah tangga yang tidak penting bagaimana dia bisa bergaul dengan eart demon eldest miss dan kekuatan apa yang akan dia peroleh untuk memimpin dirinya sendiri dan keluarga yang menurun untuk bangkit kembali ke puncak benua'
+            ],
+            [
+                'title' => 'Tales of Demons and Gods', 
+                'type' => 'Manhua', 
+                'chapters' => 506, 
+                'genre' => 'Cultivation, Fantasy', 
+                'status' => 'Ongoing', 
+                'rating' => 9.0,
+                'cover' => 'images/demons_and_god.jpg',
+                'synopsis'=> 'Nie Lie Demon Spiritist yang terkuat dikehidupan masa lalunya yang berdiri di puncak dunia persilatan namun dia kehilangan nyawanya saat pertarungan dengan Sage Emperor dan keenam dewa berperingkat binatang jiwanya kemudian terlahir kembali saat dia masih berumur 13 tahun Meskipun dia yang paling lemah di kelasnya dengan bakat terendah hanya diranah Red soul tapi dengan bantuan pengetahuan yang luas yang dia akumulasi dari kehidupan sebelumnya dia terlatih begitu cepat dari pada siapapun Mencoba untuk melindungi kota di masa mendatang sedang diserang oleh binatang dan akhirnya hancur serta melindungi kekasihnya temantemannya dan keluarganya yang meninggal karena serangan binatang Dan untuk menghancurkan keluarga Sacred yang meninggalkan tugas mereka dan kota yang dikhianati dalam kehidupan masa lalunya'
+            ],
         ];
 
         return collect($rawComics)->map(function ($data) {
