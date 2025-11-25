@@ -5,70 +5,86 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 
 class KomikController extends Controller
 {
+    /**
+     * PRIVATE METHOD: PUSAT DATA (SINGLE SOURCE OF TRUTH)
+     * Semua data komik (Home, Explore, Library, Detail) diambil dari sini.
+     */
+    private function getComicData()
+    {
+        $rawComics = [
+            // --- DATA DARI HOME/EXPLORE ---
+            ['title' => 'Omniscient Reader’s Viewpoint', 'type' => 'Manhwa', 'chapters' => 289, 'genre' => 'Fantasy, System, Adventure', 'status' => 'Ongoing', 'rating' => 9.8, 'cover' => 'images/orv.jpg'],
+            ['title' => 'Infinite Mage', 'type' => 'Manhwa', 'chapters' => 145, 'genre' => 'Action, Fantasy, Magic', 'status' => 'Ongoing', 'rating' => 9.2, 'cover' => 'images/infinite_mage.jpg'],
+            ['title' => 'Nano Machine', 'type' => 'Manhwa', 'chapters' => 287, 'genre' => 'Murim, System, Supernatural', 'status' => 'Ongoing', 'rating' => 9.5, 'cover' => 'images/nano_machine.jpg'],
+            ['title' => 'Pick Me Up', 'type' => 'Manhwa', 'chapters' => 176, 'genre' => 'Comedy, Action, Adventure', 'status' => 'Ongoing', 'rating' => 9.7, 'cover' => 'images/pick_me_up.jpg'],
+            ['title' => 'Reality Quest', 'type' => 'Manhwa', 'chapters' => 179, 'genre' => 'Action, Fantasy, System', 'status' => 'Ongoing', 'rating' => 9.1, 'cover' => 'images/reality_quest.jpg'],
+            ['title' => 'The World After The Fall', 'type' => 'Manhwa', 'chapters' => 209, 'genre' => 'Adventure, Fantasy, Action', 'status' => 'Ongoing', 'rating' => 9.2, 'cover' => 'images/World_after_the_fall.jpg'],
+            ['title' => 'Return of the Mount Hua Sect', 'type' => 'Manhwa', 'chapters' => 152, 'genre' => 'Murim, Action, Comedy', 'status' => 'Ongoing', 'rating' => 9.9, 'cover' => 'images/return_of_the_mount_hua_sect.jpg'],
+
+            // --- DATA TAMBAHAN DARI LIBRARY KAMU ---
+            ['title' => 'Bones', 'type' => 'Manhwa', 'chapters' => 30, 'genre' => 'Action, Gore, Thriller', 'status' => 'Ongoing', 'rating' => 8.8, 'cover' => 'images/bones.jpg'],
+            ['title' => 'Star Ginseng Store', 'type' => 'Manhwa', 'chapters' => 186, 'genre' => 'Drama, Slice of Life', 'status' => 'Ongoing', 'rating' => 8.5, 'cover' => 'images/star_ginseng_store.jpg'],
+            ['title' => 'My Bias Gets On The Last Train', 'type' => 'Manhwa', 'chapters' => 54, 'genre' => 'Romance, Fantasy', 'status' => 'Ongoing', 'rating' => 8.7, 'cover' => 'images/mykisah.jpg'],
+
+            // --- DATA DUMMY MANGA/MANHUA ---
+            ['title' => 'One Piece', 'type' => 'Manga', 'chapters' => 1100, 'genre' => 'Adventure, Action', 'status' => 'Ongoing', 'rating' => 9.9, 'cover' => 'https://via.placeholder.com/300x400?text=One+Piece'],
+            ['title' => 'Jujutsu Kaisen', 'type' => 'Manga', 'chapters' => 250, 'genre' => 'Action, Supernatural', 'status' => 'Ongoing', 'rating' => 9.4, 'cover' => 'https://via.placeholder.com/300x400?text=JJK'],
+            ['title' => 'Magic Emperor', 'type' => 'Manhua', 'chapters' => 500, 'genre' => 'Cultivation, Action', 'status' => 'Ongoing', 'rating' => 9.5, 'cover' => 'https://via.placeholder.com/300x400?text=Magic+Emperor'],
+            ['title' => 'Tales of Demons and Gods', 'type' => 'Manhua', 'chapters' => 450, 'genre' => 'Cultivation, Fantasy', 'status' => 'Ongoing', 'rating' => 9.0, 'cover' => 'https://via.placeholder.com/300x400?text=Tales+Demons'],
+        ];
+
+        return collect($rawComics)->map(function ($data) {
+            $slug = Str::slug($data['title']);
+
+            // Pastikan cover ada
+            if (!isset($data['cover']) || empty($data['cover'])) {
+                $data['cover'] = 'https://via.placeholder.com/300x400/1f2937/FFFFFF?text=No+Cover';
+            }
+
+            return array_merge($data, [
+                'slug' => $slug,
+                // Default synopsis jika belum ada
+                'synopsis' => "Sinopsis default untuk komik " . $data['title'] . ". Cerita seru yang wajib kamu baca!"
+            ]);
+        });
+    }
+
+    // --- 1. HALAMAN HOME ---
+    public function home()
+    {
+        $allComics = $this->getComicData();
+
+        $manga = $allComics->where('type', 'Manga')->values()->take(6);
+        $manhwa = $allComics->where('type', 'Manhwa')->values()->take(6);
+        $manhua = $allComics->where('type', 'Manhua')->values()->take(6);
+        $latestUpdates = $allComics->shuffle()->take(12);
+
+        return view('home', compact('manga', 'manhwa', 'manhua', 'latestUpdates'));
+    }
+
+    // --- 2. HALAMAN EXPLORE ---
     public function index(Request $request)
     {
-        // 1. DATA MASTER (Dipindahkan dari View)
-        // Perhatikan perbaikan struktur pada 'Omniscient Reader’s Viewpoint'
-        $covers = [
-            'images/orv.jpg', 'images/infinite_mage.jpg', 'images/nano_machine.jpg',
-            'images/bones.jpg', 'images/cosmic_heavenly_demon_3077.jpg', 'images/mykisah.jpg',
-            'images/pick_me_up.jpg', 'images/reality_quest.jpg', 'images/reicarnated_demon_god.jpg',
-            'images/return_of_the_disaster_class_hero.jpg', 'images/return_of_the_mount_hua_sect.jpg',
-            'images/star_ginseng_store.jpg', 'images/The_Extra.jpg', 'images/villain_to_kill.jpg',
-            'images/raja_rasis.jpg', 'images/solo_max_level_newbie.jpg', 'images/kuli.jpg',
-            'images/return_of_the_mad_demon.jpg', 'images/World_after_the_fall.jpg', 'images/The_ultimate_of_all_ages.jpg',
-        ];
+        $allComics = $this->getComicData();
 
-        $comicData = [
-            // FIX: Genre digabung jadi satu string atau array yang valid
-            ['title' => 'Omniscient Reader’s Viewpoint', 'chapters' => 289, 'genre' => 'Fantasy, System, Adventure', 'status' => 'Ongoing'],
-            ['title' => 'Infinite Mage', 'chapters' => 145, 'genre' => 'Action, Fantasy, Magic', 'status' => 'Ongoing'],
-            ['title' => 'Nano Machine', 'chapters' => 287, 'genre' => 'Murim, System, Supernatural', 'status' => 'Ongoing'],
-            ['title' => 'Bones', 'chapters' => 30, 'genre' => 'Adventure, Gore, Action', 'status' => 'Ongoing'],
-            ['title' => 'Cosmic Heavenly Demon 3077', 'chapters' => 65, 'genre' => 'Sci-Fi, Murim, Cultivation', 'status' => 'Ongoing'],
-            ['title' => 'My Bias Gets On The Last Train', 'chapters' => 450, 'genre' => 'Romance, Comedy, Drama', 'status' => 'Ongoing'],
-            ['title' => 'Pick Me Up', 'chapters' => 176, 'genre' => 'Comedy, Action, Adventure', 'status' => 'Ongoing'],
-            ['title' => 'Reality Quest', 'chapters' => 179, 'genre' => 'Action, Fantasy, System', 'status' => 'Ongoing'],
-            ['title' => 'Chronicles Of The Reincarnated Demon God', 'chapters' => 58, 'genre' => 'Action, Murim, Fantasy', 'status' => 'Completed'],
-            ['title' => 'The Return of The Disaster Class Hero', 'chapters' => 152, 'genre' => 'Action, Adventure, comedy', 'status' => 'Ongoing'],
-            ['title' => 'Return of the Mount Hua Sect', 'chapters' => 152, 'genre' => 'Murim, Action, Comedy', 'status' => 'Completed'],
-            ['title' => 'Star Ginseng Store', 'chapters' => 186, 'genre' => 'Slice of Life, Romance, Drama', 'status' => 'Ongoing'],
-            ['title' => 'The Extra’s Academy Survival Guide', 'chapters' => 82, 'genre' => 'Fantasy, Action, Adventure', 'status' => 'Completed'],
-            ['title' => 'Villain To Kill', 'chapters' => 209, 'genre' => 'Supernatural, Action, Fantasy', 'status' => 'Ongoing'],
-            ['title' => 'The Knight King Who Returned With A God', 'chapters' => 139, 'genre' => 'Action, Adventure, Fantasy', 'status' => 'Ongoing'],
-            ['title' => 'Solo Max-Level Newbie', 'chapters' => 233, 'genre' => 'System, Action, Adventure, Fantasy', 'status' => 'Ongoing'],
-            ['title' => 'The Greatest Estate Developer', 'chapters' => 216, 'genre' => 'Drama, Comedy, Action, Fantasy', 'status' => 'Ongoing'],
-            ['title' => 'The Return Of the Crazy Demon', 'chapters' => 179, 'genre' => 'Murim, Action, Comedy, Adventure', 'status' => 'Ongoing'],
-            ['title' => 'The World After The Fall', 'chapters' => 209, 'genre' => 'Adventure, Fantasy, Action', 'status' => 'Ongoing'],
-            ['title' => 'The Ultimate of All Ages', 'chapters' => 479, 'genre' => 'Cultivation, Action, Fantasy, Adventure', 'status' => 'Ongoing'],
-        ];
-
-        // Merge Data
-        $allComics = collect($comicData)->map(function ($data, $index) use ($covers) {
-            // Cek biar tidak error index offset jika jumlah cover < jumlah data
-            $coverImg = isset($covers[$index]) ? $covers[$index] : 'images/default.jpg';
-            return array_merge($data, ['cover' => $coverImg]);
-        });
-
-        // 2. LOGIKA FILTER
+        // Parameter Filter
         $selectedGenres = (array) $request->input('genre', []);
         $selectedStatus = $request->input('status', 'Semua');
         $searchTerm = $request->input('search', '');
         $sortBy = $request->input('sort', 'Terbaru');
 
+        // Logic Filter
         $filteredComics = $allComics->filter(function ($comic) use ($selectedGenres, $selectedStatus, $searchTerm) {
-            // Normalize genre
             $comicGenresStr = is_array($comic['genre']) ? implode(',', $comic['genre']) : $comic['genre'];
             $comicGenres = array_map('trim', explode(',', $comicGenresStr));
-            
             $comicGenresLower = array_map('mb_strtolower', $comicGenres);
             $selectedLower = array_map('mb_strtolower', $selectedGenres);
 
-            // Filter Logic
             $genreMatch = empty($selectedGenres) || count(array_intersect($comicGenresLower, $selectedLower)) > 0;
             $statusMatch = ($selectedStatus == 'Semua') || ($comic['status'] == $selectedStatus);
             $searchMatch = empty($searchTerm) || (stripos($comic['title'], $searchTerm) !== false);
@@ -76,42 +92,86 @@ class KomikController extends Controller
             return $genreMatch && $statusMatch && $searchMatch;
         });
 
-        // 3. LOGIKA SORTING
+        // Logic Sort
         switch ($sortBy) {
-            case 'Populer (All Time)':
-                $filteredComics = $filteredComics->sortByDesc('chapters');
-                break;
-            case 'Terbanyak Dibaca':
-                $filteredComics = $filteredComics->shuffle(); // Simulasi random
-                break;
-            case 'A-Z':
-                $filteredComics = $filteredComics->sortBy('title');
-                break;
-            case 'Terbaru':
-            default:
-                $filteredComics = $filteredComics->reverse();
-                break;
+            case 'Populer (All Time)': $filteredComics = $filteredComics->sortByDesc('chapters'); break;
+            case 'Terbanyak Dibaca': $filteredComics = $filteredComics->sortByDesc('rating'); break;
+            case 'A-Z': $filteredComics = $filteredComics->sortBy('title'); break;
+            case 'Terbaru': default: $filteredComics = $filteredComics->reverse(); break;
         }
 
-        // 4. PAGINATION MANUAL (Wajib karena kita pakai Array/Collection, bukan Database)
+        // Pagination
         $currentPage = Paginator::resolveCurrentPage();
-        $perPage = 10; // Jumlah item per halaman
+        $perPage = 12;
         $currentPageItems = $filteredComics->slice(($currentPage - 1) * $perPage, $perPage)->values();
 
         $paginatedComics = new LengthAwarePaginator(
-            $currentPageItems,
-            $filteredComics->count(),
-            $perPage,
-            $currentPage,
-            [
-                'path' => Paginator::resolveCurrentPath(),
-                'query' => $request->query(), // Penting: Menyimpan parameter filter saat pindah halaman
-            ]
+            $currentPageItems, $filteredComics->count(), $perPage, $currentPage,
+            ['path' => Paginator::resolveCurrentPath(), 'query' => $request->query()]
         );
 
         $allGenres = ['Action', 'Fantasy', 'Romance', 'Comedy', 'Horror', 'Slice of Life', 'Sci-Fi', 'Drama', 'Adventure', 'Cultivation', 'Gore', 'System', 'Magic', 'Murim', 'Supernatural'];
 
-        // Kirim semua variabel ke View
         return view('pages.explore', compact('paginatedComics', 'allGenres', 'selectedGenres', 'selectedStatus', 'searchTerm', 'sortBy'));
+    }
+
+    // --- 3. HALAMAN LIBRARY (BARU) ---
+    public function library(Request $request)
+    {
+        $allComics = $this->getComicData();
+        $searchTerm = $request->input('search');
+
+        // DAFTAR JUDUL FAVORIT (Simulasi Database User Favorites)
+        // Kita hanya mengambil data yang judulnya ada di list ini
+        $myFavoriteTitles = [
+            'Bones',
+            'Star Ginseng Store',
+            'My Bias Gets On The Last Train',
+            'Pick Me Up',
+            'Nano Machine',
+            'Reality Quest'
+        ];
+
+        // 1. Ambil komik yang sesuai dengan daftar favorit
+        $favoriteComics = $allComics->filter(function($comic) use ($myFavoriteTitles) {
+            return in_array($comic['title'], $myFavoriteTitles);
+        });
+
+        // 2. Jika ada pencarian di dalam Library
+        if ($searchTerm) {
+            $favoriteComics = $favoriteComics->filter(function($comic) use ($searchTerm) {
+                return stripos($comic['title'], $searchTerm) !== false;
+            });
+        }
+
+        return view('pages.library', compact('favoriteComics'));
+    }
+
+    // --- 4. HALAMAN DETAIL ---
+    public function show($slug)
+    {
+        $allComics = $this->getComicData();
+        $comic = $allComics->firstWhere('slug', $slug);
+
+        if (!$comic) {
+            abort(404);
+        }
+
+        // Dummy Chapters
+        $chapters = [];
+        $totalChapters = $comic['chapters'];
+        for ($i = $totalChapters; $i >= 1; $i--) {
+            $daysAgo = ($totalChapters - $i) * 2;
+            $chapters[] = [
+                'number' => $i,
+                'title' => null,
+                'date' => now()->subDays($daysAgo)->diffForHumans(),
+                'image' => $comic['cover'],
+                'is_new' => $i > ($totalChapters - 3)
+            ];
+        }
+        $latestChapters = array_slice($chapters, 0, 12);
+
+        return view('pages.detail', compact('comic', 'chapters', 'latestChapters'));
     }
 }

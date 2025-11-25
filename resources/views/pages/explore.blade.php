@@ -5,7 +5,6 @@
 @section('content')
 <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-10 min-h-screen">
 
-    <!-- Header Section -->
     <div class="mb-8 border-b border-gray-800 pb-5">
         <h1 class="text-3xl font-extrabold text-white flex items-center">
             <span class="mr-3 text-purple-500">🔍</span> Explore Komik
@@ -15,9 +14,10 @@
 
     <div class="flex flex-col lg:flex-row gap-8">
 
-        {{-- 1. SIDEBAR FILTER (Sticky pada Desktop) --}}
+        {{-- 1. SIDEBAR FILTER --}}
         <aside class="w-full lg:w-1/4 h-fit lg:sticky lg:top-24">
             <div class="bg-gray-900 rounded-xl p-6 border border-gray-800 shadow-lg">
+                {{-- Form action sudah benar menggunakan explore.index --}}
                 <form method="GET" action="{{ route('explore.index') }}">
                     <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-2">
                         <h3 class="text-lg font-bold text-white">Filter</h3>
@@ -64,26 +64,21 @@
 
             {{-- Toolbar: Search & Sort --}}
             <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 mb-8 flex flex-col md:flex-row gap-4 justify-between items-center shadow-sm">
-                
-                {{-- Search Form --}}
                 <form method="GET" action="{{ route('explore.index') }}" class="w-full md:flex-1 relative">
-                    <!-- Hidden inputs untuk menjaga filter sidebar tetap aktif saat search -->
                     @foreach($selectedGenres as $genre)
                         <input type="hidden" name="genre[]" value="{{ $genre }}">
                     @endforeach
                     <input type="hidden" name="status" value="{{ $selectedStatus }}">
                     <input type="hidden" name="sort" value="{{ $sortBy }}">
 
-                    <input type="text" name="search" value="{{ $searchTerm }}" placeholder="Cari judul komik..." 
+                    <input type="text" name="search" value="{{ $searchTerm }}" placeholder="Cari judul komik..."
                            class="w-full bg-gray-800 text-gray-200 pl-10 pr-4 py-2.5 rounded-lg border border-gray-700 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition text-sm">
                     <div class="absolute left-3 top-2.5 text-gray-500">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
                 </form>
 
-                {{-- Sort Dropdown --}}
                 <form method="GET" action="{{ route('explore.index') }}" class="w-full md:w-auto">
-                    <!-- Hidden inputs untuk menjaga filter & search tetap aktif saat sort -->
                     @foreach($selectedGenres as $genre)
                         <input type="hidden" name="genre[]" value="{{ $genre }}">
                     @endforeach
@@ -103,38 +98,27 @@
                 </form>
             </div>
 
-            {{-- Grid Daftar Komik (Clean Style) --}}
+            {{-- Grid Daftar Komik --}}
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-4 gap-x-5 gap-y-10">
                 @forelse ($paginatedComics as $comic)
                     <div class="group relative cursor-pointer">
-                        
-                        <!-- Link Image Wrapper -->
-                        <a href="#" class="block">
+                        {{-- FIX: Link ke halaman Detail --}}
+                        <a href="{{ route('komik.show', $comic['slug']) }}" class="block">
                             <div class="relative aspect-[3/4] rounded-xl overflow-hidden bg-gray-800 shadow-md transition-all duration-300 group-hover:shadow-purple-500/40 group-hover:-translate-y-1">
-                                
-                                {{-- Badge Status --}}
-                                <div class="absolute top-0 left-0 z-10 px-2 py-1 text-[10px] font-bold text-white rounded-br-lg shadow-sm
-                                    {{ $comic['status'] == 'Ongoing' ? 'bg-purple-600' : 'bg-blue-600' }}">
+                                <div class="absolute top-0 left-0 z-10 px-2 py-1 text-[10px] font-bold text-white rounded-br-lg shadow-sm {{ $comic['status'] == 'Ongoing' ? 'bg-purple-600' : 'bg-blue-600' }}">
                                     {{ $comic['status'] }}
                                 </div>
-
-                                {{-- Image --}}
-                                <img src="{{ asset($comic['cover']) }}" alt="{{ $comic['title'] }}" 
-                                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-                                
-                                {{-- Gradient Overlay Bawah (Subtle) --}}
+                                <img src="{{ Str::startsWith($comic['cover'], 'http') ? $comic['cover'] : asset($comic['cover']) }}" alt="{{ $comic['title'] }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                                 <div class="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-gray-900/60 to-transparent pointer-events-none"></div>
                             </div>
                         </a>
 
-                        <!-- Text Info -->
                         <div class="mt-3 px-1">
-                            <a href="#" class="group-hover:text-purple-400 transition-colors duration-200">
+                            <a href="{{ route('komik.show', $comic['slug']) }}" class="group-hover:text-purple-400 transition-colors duration-200">
                                 <h3 class="text-gray-100 font-bold text-[15px] leading-snug line-clamp-2" title="{{ $comic['title'] }}">
                                     {{ $comic['title'] }}
                                 </h3>
                             </a>
-                            
                             <div class="mt-2 space-y-1">
                                 <div class="flex justify-between items-center text-xs">
                                     <span class="text-gray-400">Chapter</span>
@@ -145,7 +129,6 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 @empty
                     <div class="col-span-full flex flex-col items-center justify-center py-20 text-center text-gray-500">
@@ -161,31 +144,17 @@
                 @endforelse
             </div>
 
-            {{-- Pagination Styling --}}
             <div class="mt-12">
-                {{ $paginatedComics->links('pagination::tailwind') }} 
-                {{-- Pastikan view pagination tailwind tersedia, atau gunakan default --}}
+                {{ $paginatedComics->links('pagination::tailwind') }}
             </div>
-            
         </div>
     </div>
 </div>
 
 <style>
-    /* Custom Scrollbar untuk list Genre */
-    .custom-scrollbar::-webkit-scrollbar {
-        width: 6px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-        background: #1f2937; 
-        border-radius: 4px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #4b5563; 
-        border-radius: 4px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #6b7280; 
-    }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #1f2937; border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #6b7280; }
 </style>
 @endsection
