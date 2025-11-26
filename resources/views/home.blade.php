@@ -9,7 +9,7 @@
         <section class="mt-8" x-data="{ activeCategory: 'manhwa' }">
 
             <h2 class="text-3xl font-bold mb-6 text-white flex items-center">
-                <span class="mr-2">🔥</span> Pilihan Editor
+                <span class="mr-2"></span> Pilihan Editor
             </h2>
 
             <div class="flex space-x-2 border-b border-gray-800 mb-6 overflow-x-auto pb-2 scrollbar-hide">
@@ -101,7 +101,7 @@
 
         <section class="mt-10">
             <h2 class="text-3xl font-bold mb-6 text-white flex items-center">
-                <span class="mr-2">📚</span> Baru Rilis
+                <span class="mr-2"></span> Baru Rilis
             </h2>
 
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-8">
