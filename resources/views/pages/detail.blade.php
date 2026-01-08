@@ -27,12 +27,12 @@
                 <p class="text-gray-400 text-lg mb-6 italic">Alternative Title Here (Korea/China)</p>
 
                 <div class="flex flex-wrap gap-3 mb-8">
-                    <button class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg flex items-center gap-2 transition shadow-lg shadow-purple-600/30">
+                    <a href="{{ route('komik.read', [$comic['slug'], 1]) }}" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg flex items-center gap-2 transition shadow-lg shadow-purple-600/30">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
                         </svg>
                         Baca
-                    </button>
+                    </a>
                     <button class="bg-gray-800 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg flex items-center gap-2 border border-gray-700 transition">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
@@ -63,7 +63,7 @@
 
                 <div x-data="{ expanded: false }" class="mb-8">
                     <p class="text-gray-300 leading-relaxed" :class="expanded ? '' : 'line-clamp-3'">
-                        {{ $comic['synopsis'] ?? 'Han Sung, seorang hunter monster SSS-Class dari Bumi, dipanggil ke dunia lain dan dipaksa mengabdikan seluruh hidupnya sebagai anjing pemburu Kekaisaran. Namun setelah dikhianati dan kehilangan nyawanya, ia terlahir kembali sebagai Dale, putra tertua dari keluarga Sachsen, sekaligus pewaris "Lord Black", penyihir kegelapan terkuat di benua yang berkuasa di puncak Black Tower...' }}
+                        {{ $comic['synopsis'] }}
                     </p>
                     <button @click="expanded = !expanded" class="text-purple-400 text-sm font-semibold hover:text-purple-300 mt-1 focus:outline-none">
                         <span x-text="expanded ? 'Show Less' : '... Read More'"></span>
@@ -111,7 +111,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 @foreach ($chapters as $chapter)
-                <a href="#" class="group relative bg-[#161616] hover:bg-[#1f1f1f] rounded-lg overflow-hidden flex items-center p-3 border border-transparent hover:border-gray-700 transition duration-200">
+                <a href="{{ route('komik.read', [$comic['slug'], $chapter['number']]) }}" class="group relative bg-[#161616] hover:bg-[#1f1f1f] rounded-lg overflow-hidden flex items-center p-3 border border-transparent hover:border-gray-700 transition duration-200">
 
                     <div class="w-20 h-16 rounded overflow-hidden flex-shrink-0 mr-4 relative">
                         <img src="{{ asset($chapter['image']) }}" alt="Ch {{ $chapter['number'] }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
