@@ -29,3 +29,29 @@
 
 </body>
 </html>
+
+<!-- <!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yield('title', 'KOMIKIN')</title>
+    
+    {{-- Kita pakai Tailwind CDN agar styling langsung jalan tanpa install npm --}}
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        body {
+            background-color: #121212; /* Latar belakang hitam pekat */
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    
+    {{-- Area Konten Utama --}}
+    @yield('content')
+
+</body>
+</html> -->
