@@ -19,31 +19,53 @@
             </p>
         </div>
 
-        <form class="mt-8 space-y-6" action="#" method="POST" onsubmit="event.preventDefault(); window.location='{{ route('login') }}'">
+        {{-- Menampilkan Error Validasi Jika Ada --}}
+        @if ($errors->any())
+            <div class="bg-red-500/10 border border-red-500 text-red-500 px-4 py-2 rounded-lg text-sm">
+                <ul class="list-disc list-inside">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        {{-- PERBAIKAN: Action mengarah ke route register, Method POST, dan hapus onsubmit preventDefault --}}
+        <form class="mt-8 space-y-6" action="{{ route('register') }}" method="POST">
+            @csrf {{-- WAJIB: Keamanan Laravel --}}
+            
             <div class="space-y-4">
 
                 {{-- Nama Lengkap --}}
                 <div>
-                    <label class="block text-sm font-medium text-gray-400 mb-1">Nama Lengkap</label>
-                    <input type="text" required class="appearance-none block w-full px-3 py-3 border border-gray-700 placeholder-gray-500 text-white bg-gray-900 rounded-lg focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition" placeholder="Jhon Doe">
+                    <label for="name" class="block text-sm font-medium text-gray-400 mb-1">Nama Lengkap</label>
+                    <input id="name" name="name" type="text" value="{{ old('name') }}" required 
+                        class="appearance-none block w-full px-3 py-3 border border-gray-700 placeholder-gray-500 text-white bg-gray-900 rounded-lg focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition" 
+                        placeholder="Jhon Doe">
                 </div>
 
                 {{-- Email --}}
                 <div>
-                    <label class="block text-sm font-medium text-gray-400 mb-1">Email Address</label>
-                    <input type="email" required class="appearance-none block w-full px-3 py-3 border border-gray-700 placeholder-gray-500 text-white bg-gray-900 rounded-lg focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition" placeholder="nama@email.com">
+                    <label for="email" class="block text-sm font-medium text-gray-400 mb-1">Email Address</label>
+                    <input id="email" name="email" type="email" value="{{ old('email') }}" required 
+                        class="appearance-none block w-full px-3 py-3 border border-gray-700 placeholder-gray-500 text-white bg-gray-900 rounded-lg focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition" 
+                        placeholder="nama@email.com">
                 </div>
 
                 {{-- Password --}}
                 <div>
-                    <label class="block text-sm font-medium text-gray-400 mb-1">Password</label>
-                    <input type="password" required class="appearance-none block w-full px-3 py-3 border border-gray-700 placeholder-gray-500 text-white bg-gray-900 rounded-lg focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition" placeholder="••••••••">
+                    <label for="password" class="block text-sm font-medium text-gray-400 mb-1">Password</label>
+                    <input id="password" name="password" type="password" required 
+                        class="appearance-none block w-full px-3 py-3 border border-gray-700 placeholder-gray-500 text-white bg-gray-900 rounded-lg focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition" 
+                        placeholder="••••••••">
                 </div>
 
                 {{-- Confirm Password --}}
                 <div>
-                    <label class="block text-sm font-medium text-gray-400 mb-1">Konfirmasi Password</label>
-                    <input type="password" required class="appearance-none block w-full px-3 py-3 border border-gray-700 placeholder-gray-500 text-white bg-gray-900 rounded-lg focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition" placeholder="••••••••">
+                    <label for="password_confirmation" class="block text-sm font-medium text-gray-400 mb-1">Konfirmasi Password</label>
+                    <input id="password_confirmation" name="password_confirmation" type="password" required 
+                        class="appearance-none block w-full px-3 py-3 border border-gray-700 placeholder-gray-500 text-white bg-gray-900 rounded-lg focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition" 
+                        placeholder="••••••••">
                 </div>
             </div>
 
