@@ -1,38 +1,66 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
+    <title>Admin Login - Secure Access</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
+<body class="bg-neutral-950 text-white h-screen flex items-center justify-center overflow-hidden relative">
 
-    <div class="w-full max-w-md bg-white rounded-lg shadow-md p-8">
-        <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Admin Login</h2>
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-purple-700/30 rounded-full blur-[120px] -z-10"></div>
+    <div class="absolute bottom-0 right-0 w-[400px] h-[400px] bg-blue-900/20 rounded-full blur-[100px] -z-10"></div>
 
-        @if ($errors->any())
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                {{ $errors->first() }}
-            </div>
-        @endif
-
-        <form action="{{ route('admin.login.submit') }}" method="POST">
-            @csrf
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Email Address</label>
-                <input type="email" name="email" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+    <div class="w-full max-w-md p-8 relative z-10">
+        
+        <div class="bg-neutral-900/60 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-8">
+            
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold tracking-tight text-white">Admin<span class="text-purple-500">Panel</span></h1>
+                <p class="text-neutral-400 text-sm mt-2">Masuk untuk mengelola dashboard</p>
             </div>
 
-            <div class="mb-6">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
-                <input type="password" name="password" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-            </div>
+            @if ($errors->any())
+                <div class="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/50 text-red-400 text-sm text-center">
+                    {{ $errors->first() }}
+                </div>
+            @endif
 
-            <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition duration-300">
-                Login Masuk
-            </button>
-        </form>
+            <form action="{{ route('admin.login.submit') }}" method="POST" class="space-y-6">
+                @csrf
+                
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-neutral-300">Email Address</label>
+                    <div class="relative">
+                        <input type="email" name="email" 
+                            class="w-full bg-neutral-800/50 border border-neutral-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all placeholder-neutral-500" 
+                            placeholder="admin@example.com" required>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-neutral-300">Password</label>
+                    <div class="relative">
+                        <input type="password" name="password" 
+                            class="w-full bg-neutral-800/50 border border-neutral-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all placeholder-neutral-500" 
+                            placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <button type="submit" 
+                    class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold py-3 rounded-xl shadow-lg shadow-purple-500/30 transition-all transform hover:scale-[1.02] active:scale-95">
+                    Sign In Dashboard
+                </button>
+            </form>
+            
+            <div class="mt-6 text-center text-xs text-neutral-500">
+                &copy; {{ date('Y') }} Admin System. All rights reserved.
+            </div>
+        </div>
     </div>
 
 </body>
