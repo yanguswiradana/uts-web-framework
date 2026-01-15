@@ -22,4 +22,9 @@ class Chapter extends Model
     {
         return $this->belongsTo(Comic::class);
     }
+
+    public function comments()
+{
+    return $this->hasMany(Comment::class)->latest(); // Komen terbaru di atas
+}
 }

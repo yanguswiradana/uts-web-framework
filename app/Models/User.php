@@ -58,4 +58,9 @@ class User extends Authenticatable
     {
         return $this->bookmarks()->where('comic_id', $comicId)->exists();
     }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
 }

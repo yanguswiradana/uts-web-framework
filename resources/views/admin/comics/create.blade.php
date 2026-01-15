@@ -22,14 +22,13 @@
                     <input type="text" name="author" value="{{ old('author') }}" required placeholder="Nama Pengarang" 
                            class="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none">
                 </div>
-
                 <div>
                     <label class="block text-sm font-bold text-neutral-300 mb-2">Tipe Komik <span class="text-red-500">*</span></label>
                     <select name="type" required class="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none">
                         <option value="" disabled selected>-- Pilih Tipe --</option>
-                        <option value="Manga" {{ old('type') == 'Manga' ? 'selected' : '' }}>Manga (Jepang)</option>
-                        <option value="Manhwa" {{ old('type') == 'Manhwa' ? 'selected' : '' }}>Manhwa (Korea)</option>
-                        <option value="Manhua" {{ old('type') == 'Manhua' ? 'selected' : '' }}>Manhua (China)</option>
+                        <option value="Manga">Manga (Jepang)</option>
+                        <option value="Manhwa">Manhwa (Korea)</option>
+                        <option value="Manhua">Manhua (China)</option>
                     </select>
                 </div>
             </div>
@@ -38,33 +37,42 @@
                 <div>
                     <label class="block text-sm font-bold text-neutral-300 mb-2">Status <span class="text-red-500">*</span></label>
                     <select name="status" required class="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none">
-                        <option value="Ongoing" {{ old('status') == 'Ongoing' ? 'selected' : '' }}>Ongoing</option>
-                        <option value="Completed" {{ old('status') == 'Completed' ? 'selected' : '' }}>Completed</option>
+                        <option value="Ongoing">Ongoing</option>
+                        <option value="Completed">Completed</option>
                     </select>
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-bold text-neutral-300 mb-2">Genre (Pilih Minimal 1) <span class="text-red-500">*</span></label>
-                    <select name="genres[]" multiple required class="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none h-32">
-                        @foreach($genres as $genre)
-                            <option value="{{ $genre->id }}" {{ (collect(old('genres'))->contains($genre->id)) ? 'selected' : '' }}>
-                                {{ $genre->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <p class="text-xs text-neutral-500 mt-1">Tekan <strong>Ctrl + Klik</strong> (Windows) atau <strong>Command + Klik</strong> (Mac) untuk memilih lebih dari satu.</p>
+                    <label class="block text-sm font-bold text-neutral-300 mb-2">Cover Komik <span class="text-red-500">*</span></label>
+                    <input type="file" name="cover" required accept="image/*" class="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none">
                 </div>
             </div>
 
             <div>
-                <label class="block text-sm font-bold text-neutral-300 mb-2">Sinopsis <span class="text-red-500">*</span></label>
-                <textarea name="description" rows="4" required class="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none">{{ old('description') }}</textarea>
+                <label class="block text-sm font-bold text-neutral-300 mb-2">Pilih Genre (Klik untuk memilih) <span class="text-red-500">*</span></label>
+                
+                <div class="flex flex-wrap gap-2 p-4 bg-neutral-950 border border-white/10 rounded-xl" id="genreContainer">
+                    @foreach($genres as $genre)
+                        <div onclick="toggleGenre('{{ $genre->id }}')" 
+                             id="genre-btn-{{ $genre->id }}"
+                             class="cursor-pointer px-4 py-2 rounded-lg text-sm font-bold border border-white/10 bg-neutral-800 text-neutral-400 hover:bg-neutral-700 transition-all select-none">
+                            {{ $genre->name }}
+                        </div>
+                    @endforeach
+                </div>
+
+                <select name="genres[]" id="realGenreInput" multiple class="hidden" required>
+                    @foreach($genres as $genre)
+                        <option value="{{ $genre->id }}">{{ $genre->name }}</option>
+                    @endforeach
+                </select>
+                
+                <p class="text-xs text-neutral-500 mt-2">Genre yang dipilih akan berwarna <strong>Ungu</strong>.</p>
             </div>
 
             <div>
-                <label class="block text-sm font-bold text-neutral-300 mb-2">Cover Komik <span class="text-red-500">*</span></label>
-                <input type="file" name="cover" required accept="image/*" class="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none">
-                <p class="text-xs text-neutral-500 mt-1">Format: JPG, PNG, WEBP. Maks 2MB.</p>
+                <label class="block text-sm font-bold text-neutral-300 mb-2">Sinopsis <span class="text-red-500">*</span></label>
+                <textarea name="description" rows="4" required class="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none"></textarea>
             </div>
 
             <div class="flex justify-end gap-4 pt-4 border-t border-white/5">
@@ -74,4 +82,25 @@
         </form>
     </div>
 </div>
+
+<script>
+    function toggleGenre(id) {
+        // 1. Ambil elemen option di select asli
+        const option = document.querySelector(`#realGenreInput option[value='${id}']`);
+        // 2. Ambil tombol visual
+        const btn = document.getElementById(`genre-btn-${id}`);
+
+        // 3. Toggle status selected
+        option.selected = !option.selected;
+
+        // 4. Ubah Tampilan Tombol (Ungu = Aktif, Abu = Mati)
+        if (option.selected) {
+            btn.classList.remove('bg-neutral-800', 'text-neutral-400');
+            btn.classList.add('bg-purple-600', 'text-white', 'border-purple-500');
+        } else {
+            btn.classList.remove('bg-purple-600', 'text-white', 'border-purple-500');
+            btn.classList.add('bg-neutral-800', 'text-neutral-400');
+        }
+    }
+</script>
 @endsection

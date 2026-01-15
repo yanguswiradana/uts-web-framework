@@ -23,7 +23,7 @@
                     <i data-lucide="arrow-left" class="w-6 h-6"></i>
                 </a>
                 <div class="min-w-0">
-                    <h1 class="text-sm md:text-base font-bold text-white truncate">{{ $comic->title }}</h1>
+                    <h1 class="text-sm md:text-base font-bold text-white truncate max-w-[150px] md:max-w-xs">{{ $comic->title }}</h1>
                     <p class="text-xs text-purple-400 font-medium">Chapter {{ $chapterNumber }}</p>
                 </div>
             </div>
@@ -33,37 +33,94 @@
                     <i data-lucide="list" class="w-5 h-5"></i>
                 </button>
                 
-                <button class="hidden md:block p-2 hover:bg-white/10 rounded-lg text-neutral-400 hover:text-white transition-colors">
-                    <i data-lucide="bookmark" class="w-5 h-5"></i>
-                </button>
+                @auth
+                    <form action="{{ route('komik.bookmark', $comic->slug) }}" method="POST" class="hidden md:block">
+                        @csrf
+                        <button type="submit" class="p-2 hover:bg-white/10 rounded-lg transition-colors {{ Auth::user()->hasBookmarked($comic->id) ? 'text-purple-500' : 'text-neutral-400 hover:text-white' }}" 
+                                title="{{ Auth::user()->hasBookmarked($comic->id) ? 'Hapus dari Library' : 'Simpan ke Library' }}">
+                            <i data-lucide="bookmark" class="w-5 h-5 {{ Auth::user()->hasBookmarked($comic->id) ? 'fill-current' : '' }}"></i>
+                        </button>
+                    </form>
+                @endauth
             </div>
         </div>
     </header>
 
-    <div @click="toggleUI" class="min-h-screen pb-32 cursor-pointer pt-0 md:pt-16">
-        <div class="max-w-3xl mx-auto bg-black shadow-2xl min-h-screen">
+    <div @click="toggleUI" class="min-h-screen cursor-pointer pt-0 md:pt-16 pb-20">
+        
+        <div class="max-w-3xl mx-auto bg-black shadow-2xl min-h-[50vh]">
             @foreach($chapterImages as $image)
                 <img src="{{ $image }}" class="w-full h-auto block select-none" loading="lazy">
             @endforeach
         </div>
 
-        <div class="max-w-3xl mx-auto px-6 py-12 flex flex-col gap-4">
-            <h3 class="text-center text-white font-bold text-lg">Chapter Selesai</h3>
+        <div class="max-w-3xl mx-auto px-6 py-12 flex flex-col gap-6">
+            <h3 class="text-center text-white font-bold text-lg opacity-50">Chapter Selesai</h3>
             <div class="flex gap-3">
                 @if($prevChapter)
-                    <a href="{{ route('komik.read', [$comic->slug, $prevChapter]) }}" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-white py-3 rounded-xl font-bold text-center border border-white/5 transition-colors">
+                    <a href="{{ route('komik.read', [$comic->slug, $prevChapter]) }}" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-white py-3.5 rounded-xl font-bold text-center border border-white/5 transition-colors">
                         Prev Chapter
                     </a>
                 @endif
                 @if($nextChapter)
-                    <a href="{{ route('komik.read', [$comic->slug, $nextChapter]) }}" class="flex-1 bg-purple-600 hover:bg-purple-500 text-white py-3 rounded-xl font-bold text-center shadow-lg shadow-purple-900/40 transition-colors">
+                    <a href="{{ route('komik.read', [$comic->slug, $nextChapter]) }}" class="flex-1 bg-purple-600 hover:bg-purple-500 text-white py-3.5 rounded-xl font-bold text-center shadow-lg shadow-purple-900/40 transition-colors">
                         Next Chapter
                     </a>
                 @else
-                    <a href="{{ route('komik.show', $comic->slug) }}" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-white py-3 rounded-xl font-bold text-center border border-white/5">
+                    <a href="{{ route('komik.show', $comic->slug) }}" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-white py-3.5 rounded-xl font-bold text-center border border-white/5">
                         Selesai
                     </a>
                 @endif
+            </div>
+        </div>
+
+        <div class="max-w-3xl mx-auto px-4 pb-32 cursor-auto" @click.stop>
+            <div class="border-t border-white/10 pt-10">
+                <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                    <i data-lucide="message-square" class="w-5 h-5 text-purple-500"></i>
+                    Komentar <span class="text-neutral-500 text-sm font-normal">({{ $comments->count() }})</span>
+                </h3>
+
+                @auth
+                    <form action="{{ route('chapter.comment', $chapter->id) }}" method="POST" class="mb-10">
+                        @csrf
+                        <div class="flex gap-4">
+                            <div class="w-10 h-10 rounded-full bg-purple-600 flex-shrink-0 flex items-center justify-center font-bold text-white">
+                                {{ substr(Auth::user()->name, 0, 1) }}
+                            </div>
+                            <div class="flex-1">
+                                <textarea name="body" rows="2" placeholder="Tulis komentar..." class="w-full bg-neutral-900 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-purple-500 transition-colors resize-none text-sm" required></textarea>
+                                <div class="flex justify-end mt-2">
+                                    <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg font-bold text-xs transition-all">Kirim</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                @else
+                    <div class="bg-neutral-900/50 rounded-xl p-4 text-center border border-white/5 mb-8">
+                        <p class="text-neutral-400 text-sm">Login untuk berkomentar.</p>
+                        <a href="{{ route('login') }}" class="text-purple-400 font-bold text-sm hover:underline">Login disini</a>
+                    </div>
+                @endauth
+
+                <div class="space-y-6">
+                    @forelse($comments as $comment)
+                        <div class="flex gap-3">
+                            <div class="w-8 h-8 rounded-full bg-neutral-800 flex-shrink-0 flex items-center justify-center font-bold text-neutral-400 text-xs border border-white/5">
+                                {{ substr($comment->user->name, 0, 1) }}
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="font-bold text-white text-sm">{{ $comment->user->name }}</span>
+                                    <span class="text-[10px] text-neutral-600">{{ $comment->created_at->diffForHumans() }}</span>
+                                </div>
+                                <p class="text-neutral-300 text-sm leading-relaxed">{{ $comment->body }}</p>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="text-center text-neutral-600 text-sm italic py-4">Belum ada komentar.</p>
+                    @endforelse
+                </div>
             </div>
         </div>
     </div>
@@ -175,24 +232,18 @@
             showChapterList: false,
 
             initReader() {
-                // Initialize Lucide Icons manually when Alpine loads
                 this.$nextTick(() => {
                     lucide.createIcons();
                 });
             },
 
-            // Logic: Hide UI on scroll down, Show on scroll up
             handleScroll() {
                 let st = window.pageYOffset || document.documentElement.scrollTop;
-                
-                // Jika sedang auto scroll, jangan mainkan UI toggle
                 if (this.isAutoScrolling) return;
 
                 if (st > this.lastScrollTop && st > 100) {
-                    // Scroll Down
                     this.showUI = false;
                 } else {
-                    // Scroll Up
                     this.showUI = true;
                 }
                 this.lastScrollTop = st <= 0 ? 0 : st;
@@ -200,35 +251,28 @@
 
             toggleUI() {
                 this.showUI = !this.showUI;
-                // Stop auto scroll if user interacts manually
                 if(this.isAutoScrolling) this.toggleAutoScroll();
             },
 
             toggleAutoScroll() {
                 this.isAutoScrolling = !this.isAutoScrolling;
-                
                 if (this.isAutoScrolling) {
-                    this.showUI = false; // Hide UI for immersion
+                    this.showUI = false;
                     this.startScroll();
                 } else {
-                    this.showUI = true; // Show UI when paused
+                    this.showUI = true;
                     this.stopScroll();
                 }
-                
-                // Re-init icons karena perubahan DOM
                 this.$nextTick(() => lucide.createIcons());
             },
 
             startScroll() {
-                this.stopScroll(); // Clear existing
-                // Speed logic: makin tinggi angka, makin cepat (interval makin kecil)
+                this.stopScroll();
                 let speedMs = 30 / this.scrollSpeed; 
-                
                 this.scrollInterval = setInterval(() => {
                     window.scrollBy(0, 1);
-                    // Cek jika sudah mentok bawah
                     if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-                        this.toggleAutoScroll(); // Stop
+                        this.toggleAutoScroll();
                         this.showUI = true;
                     }
                 }, speedMs);
@@ -241,14 +285,14 @@
             increaseSpeed() {
                 if (this.scrollSpeed < 5) {
                     this.scrollSpeed += 0.5;
-                    this.startScroll(); // Restart with new speed
+                    this.startScroll();
                 }
             },
 
             decreaseSpeed() {
                 if (this.scrollSpeed > 0.5) {
                     this.scrollSpeed -= 0.5;
-                    this.startScroll(); // Restart with new speed
+                    this.startScroll();
                 }
             },
 
