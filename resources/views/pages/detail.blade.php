@@ -1,112 +1,199 @@
 @extends('layouts.app')
 
-@section('title', $comic->title . ' - KOMIKIN')
+@section('title', $comic->title)
 
 @section('content')
 
-    <div class="absolute top-0 left-0 w-full h-[600px] overflow-hidden -z-10">
-        <div class="absolute inset-0 bg-gradient-to-b from-neutral-950/30 via-neutral-950/90 to-neutral-950"></div>
-        <img src="{{ Str::startsWith($comic->cover, 'http') ? $comic->cover : asset('storage/' . $comic->cover) }}" 
-             class="w-full h-full object-cover blur-3xl opacity-30">
-    </div>
-
-    <div class="flex flex-col md:flex-row gap-10 items-start mt-10">
+    <div class="relative bg-neutral-900 border border-white/5 rounded-3xl p-6 md:p-10 mb-10 overflow-hidden shadow-2xl">
         
-        <div class="w-full md:w-[300px] shrink-0 sticky top-24">
-            <div class="rounded-2xl overflow-hidden shadow-2xl border border-white/10 group relative">
-                <img src="{{ Str::startsWith($comic->cover, 'http') ? $comic->cover : asset('storage/' . $comic->cover) }}" 
-                     alt="{{ $comic->title }}" 
-                     class="w-full h-auto object-cover">
-                
-                <div class="absolute top-3 right-3">
-                    <span class="px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md border border-white/20 shadow-lg
-                        {{ $comic->status == 'Ongoing' ? 'bg-green-500/20 text-green-400' : 'bg-blue-500/20 text-blue-400' }}">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-purple-600/20 rounded-full blur-[100px] -mr-20 -mt-20 pointer-events-none"></div>
+        
+        <div class="relative z-10 flex flex-col md:flex-row gap-8 md:gap-12">
+            
+            <div class="w-full md:w-72 shrink-0 group">
+                <div class="aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl border border-white/10 relative">
+                    <img src="{{ Str::startsWith($comic->cover, 'http') ? $comic->cover : asset('storage/' . $comic->cover) }}" 
+                         alt="{{ $comic->title }}" 
+                         class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
+                    
+                    <div class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md border border-white/20 
+                        {{ $comic->status == 'Ongoing' ? 'bg-green-500/80 text-white' : 'bg-blue-500/80 text-white' }}">
                         {{ $comic->status }}
-                    </span>
+                    </div>
                 </div>
             </div>
 
-            <div class="md:hidden mt-6 flex gap-3">
-                @php $firstCh = $chapters->sortBy('number')->first(); @endphp
-                @if($firstCh)
-                <a href="{{ route('komik.read', [$comic->slug, $firstCh->number]) }}" class="flex-1 bg-purple-600 text-white py-3 rounded-xl font-bold text-center">Baca</a>
-                @endif
-            </div>
-        </div>
-
-        <div class="flex-1 min-w-0">
-            <h1 class="text-3xl md:text-5xl font-bold text-white mb-2 leading-tight">{{ $comic->title }}</h1>
-            <div class="flex flex-wrap items-center gap-4 text-sm text-neutral-400 mb-6">
-                <span class="flex items-center gap-1.5"><i data-lucide="pen-tool" class="w-4 h-4"></i> {{ $comic->author }}</span>
-                <span class="w-1 h-1 rounded-full bg-neutral-600"></span>
-                <span class="flex items-center gap-1.5"><i data-lucide="book-open" class="w-4 h-4"></i> {{ $comic->type }}</span>
-                <span class="w-1 h-1 rounded-full bg-neutral-600"></span>
-                <span class="text-yellow-500 flex items-center gap-1"><i data-lucide="star" class="w-4 h-4 fill-yellow-500"></i> 4.8</span>
-            </div>
-
-            <div class="flex flex-wrap gap-2 mb-8">
-                @foreach($comic->genres as $genre)
-                    <a href="{{ route('explore.index', ['genre[]' => $genre->name]) }}" 
-                       class="px-3 py-1.5 rounded-lg text-xs font-medium bg-white/5 hover:bg-purple-600 hover:text-white border border-white/5 transition-all text-neutral-300">
-                        {{ $genre->name }}
-                    </a>
-                @endforeach
-            </div>
-
-            <div class="hidden md:flex flex-wrap gap-4 mb-10">
-                @php $firstCh = $chapters->sortBy('number')->first(); @endphp
-                
-                @if($firstCh)
-                <a href="{{ route('komik.read', [$comic->slug, $firstCh->number]) }}" 
-                   class="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-purple-900/30 flex items-center gap-2 hover:scale-105">
-                    <i data-lucide="book-open-check" class="w-5 h-5"></i> Mulai Baca Ch. {{ $firstCh->number }}
-                </a>
-                @endif
-
-                <button class="bg-neutral-800 hover:bg-neutral-700 text-white px-6 py-3.5 rounded-xl font-bold transition-all border border-white/5 flex items-center gap-2">
-                    <i data-lucide="bookmark" class="w-5 h-5"></i> Bookmark
-                </button>
-            </div>
-
-            <div class="bg-neutral-900 border border-white/5 rounded-2xl p-6 mb-10">
-                <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
-                    <i data-lucide="align-left" class="w-5 h-5 text-purple-500"></i> Sinopsis
-                </h3>
-                <p class="text-neutral-400 leading-relaxed text-sm md:text-base">
-                    {{ $comic->description ?? 'Tidak ada deskripsi.' }}
-                </p>
-            </div>
-
-            <div class="mb-10">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-bold text-white">Chapter List</h3>
+            <div class="flex-1 flex flex-col">
+                <div class="mb-4">
+                    <span class="text-purple-400 font-bold tracking-wider text-xs uppercase mb-2 block">{{ $comic->type }}</span>
+                    <h1 class="text-3xl md:text-5xl font-bold text-white leading-tight mb-4">{{ $comic->title }}</h1>
                     
-                    <div class="relative">
-                        <input type="text" placeholder="Cari Ch..." class="bg-neutral-900 border border-white/10 rounded-lg py-1.5 pl-8 pr-3 text-xs text-white focus:border-purple-500 focus:outline-none w-32">
-                        <i data-lucide="search" class="absolute left-2.5 top-2 w-3 h-3 text-neutral-500"></i>
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        @foreach($comic->genres as $genre)
+                            <a href="{{ route('explore.index', ['genre[]' => $genre->name]) }}" class="px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 text-xs text-neutral-300 hover:text-white transition-colors">
+                                {{ $genre->name }}
+                            </a>
+                        @endforeach
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-                    @foreach($chapters as $chapter)
-                    <a href="{{ route('komik.read', [$comic->slug, $chapter->number]) }}" 
-                       class="group flex items-center justify-between p-4 rounded-xl bg-neutral-900 border border-white/5 hover:border-purple-500/50 hover:bg-neutral-800 transition-all">
-                        
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-neutral-800 flex items-center justify-center text-neutral-500 group-hover:bg-purple-600 group-hover:text-white transition-colors">
-                                <span class="text-xs font-bold">{{ $chapter->number }}</span>
-                            </div>
-                            <div>
-                                <p class="text-sm font-bold text-white group-hover:text-purple-400 transition-colors">Chapter {{ $chapter->number }}</p>
-                                <p class="text-[10px] text-neutral-500">{{ $chapter->created_at->format('d M Y') }}</p>
-                            </div>
+                <div class="grid grid-cols-3 gap-4 border-y border-white/5 py-6 mb-6">
+                    <div>
+                        <p class="text-neutral-500 text-xs uppercase font-bold mb-1">Total Chapter</p>
+                        <p class="text-white font-bold text-lg">{{ $comic->chapters_count }}</p>
+                    </div>
+                    <div>
+                        <p class="text-neutral-500 text-xs uppercase font-bold mb-1">Rilis</p>
+                        <p class="text-white font-bold text-lg">{{ $comic->created_at->format('Y') }}</p>
+                    </div>
+                    
+                    <div x-data="{ openRating: false }" class="relative">
+                        <p class="text-neutral-500 text-xs uppercase font-bold mb-1">Rating</p>
+                        <div class="flex items-center gap-1 text-yellow-500 font-bold text-lg cursor-pointer hover:opacity-80 transition-opacity" @click="openRating = !openRating">
+                            <i data-lucide="star" class="w-5 h-5 fill-current"></i> 
+                            <span>{{ number_format($comic->ratings_avg_stars ?? 0, 1) }}</span>
+                            @if(isset($comic->ratings_count))
+                                <span class="text-xs text-neutral-500 font-normal ml-1">({{ $comic->ratings_count }})</span>
+                            @endif
                         </div>
 
-                        <i data-lucide="chevron-right" class="w-4 h-4 text-neutral-600 group-hover:text-white"></i>
-                    </a>
-                    @endforeach
+                        <div x-show="openRating" @click.outside="openRating = false" 
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="opacity-0 scale-95"
+                             x-transition:enter-end="opacity-100 scale-100"
+                             class="absolute mt-2 left-0 bg-neutral-900 border border-white/10 rounded-xl p-4 shadow-2xl z-50 w-64 md:w-72"
+                             style="display: none;">
+                             
+                            @auth
+                                <form action="{{ route('komik.rate', $comic->slug) }}" method="POST">
+                                    @csrf
+                                    <div class="text-center mb-3">
+                                        <p class="text-sm text-white font-bold">Beri Penilaian</p>
+                                        <p class="text-xs text-neutral-400">Bagaimana menurutmu komik ini?</p>
+                                    </div>
+                                    
+                                    <div class="flex flex-row-reverse justify-center gap-2 mb-4 group">
+                                        @for($i = 5; $i >= 1; $i--)
+                                            <input type="radio" id="star{{$i}}" name="stars" value="{{$i}}" 
+                                                   class="peer hidden" 
+                                                   {{ (Auth::user()->user_rating && Auth::user()->user_rating->stars == $i) ? 'checked' : '' }} />
+                                            <label for="star{{$i}}" class="cursor-pointer text-neutral-700 peer-checked:text-yellow-500 hover:text-yellow-400 peer-hover:text-yellow-400 transition-colors">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 fill-current" viewBox="0 0 24 24">
+                                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-5.82 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                                </svg>
+                                            </label>
+                                        @endfor
+                                    </div>
+
+                                    <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold py-2.5 rounded-lg transition-colors shadow-lg shadow-purple-900/20">
+                                        Kirim Rating
+                                    </button>
+                                </form>
+                            @else
+                                <div class="text-center py-2">
+                                    <div class="w-10 h-10 bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-2">
+                                        <i data-lucide="lock" class="w-4 h-4 text-neutral-400"></i>
+                                    </div>
+                                    <p class="text-xs text-neutral-400 mb-3">Silakan login untuk memberi rating.</p>
+                                    <a href="{{ route('login') }}" class="block w-full bg-white text-neutral-950 hover:bg-neutral-200 text-xs font-bold py-2 rounded-lg transition-colors">
+                                        Masuk Akun
+                                    </a>
+                                </div>
+                            @endauth
+                        </div>
+                    </div>
                 </div>
+
+                <div class="mb-8 flex-1">
+                    <h3 class="text-white font-bold mb-2">Sinopsis</h3>
+                    <p class="text-neutral-400 text-sm leading-relaxed whitespace-pre-line">
+                        {{ $comic->description ?? 'Belum ada deskripsi untuk komik ini.' }}
+                    </p>
+                </div>
+
+                <div class="flex gap-3 mt-auto">
+                    @if($chapters->count() > 0)
+                        <a href="{{ route('komik.read', [$comic->slug, $chapters->first()->number]) }}" 
+                           class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-purple-900/40 transition-all flex items-center justify-center gap-2 hover:-translate-y-0.5">
+                            <i data-lucide="book-open" class="w-5 h-5"></i>
+                            <span>Mulai Baca</span>
+                        </a>
+                    @else
+                        <button disabled class="flex-1 bg-neutral-800 text-neutral-500 font-bold py-3.5 px-6 rounded-xl cursor-not-allowed flex items-center justify-center gap-2">
+                            <i data-lucide="clock" class="w-5 h-5"></i>
+                            <span>Coming Soon</span>
+                        </button>
+                    @endif
+
+                    @auth
+                        <form action="{{ route('komik.bookmark', $comic->slug) }}" method="POST">
+                            @csrf
+                            @if(Auth::user()->hasBookmarked($comic->id))
+                                <button type="submit" class="h-14 w-14 rounded-xl border border-red-500/30 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center transition-all shadow-lg shadow-red-900/10" title="Hapus dari Library">
+                                    <i data-lucide="bookmark-minus" class="w-6 h-6 fill-current"></i>
+                                </button>
+                            @else
+                                <button type="submit" class="h-14 w-14 rounded-xl border border-white/10 bg-neutral-800 text-neutral-400 hover:border-purple-500 hover:text-purple-400 hover:bg-white/5 flex items-center justify-center transition-all" title="Simpan ke Library">
+                                    <i data-lucide="bookmark-plus" class="w-6 h-6"></i>
+                                </button>
+                            @endif
+                        </form>
+                    @else
+                        <a href="{{ route('login') }}" class="h-14 w-14 rounded-xl border border-white/10 bg-neutral-800 text-neutral-400 hover:bg-neutral-700 hover:text-white flex items-center justify-center transition-all" title="Login untuk Bookmark">
+                            <i data-lucide="bookmark" class="w-6 h-6"></i>
+                        </a>
+                    @endauth
+                </div>
+
             </div>
         </div>
     </div>
+
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="layers" class="w-6 h-6 text-purple-500"></i> Daftar Chapter
+        </h2>
+        
+        <div class="relative hidden sm:block">
+            <input type="text" placeholder="Cari chapter..." class="bg-neutral-900 border border-white/10 rounded-full py-2 pl-9 pr-4 text-sm focus:outline-none focus:border-purple-500 w-48 transition-all focus:w-64 text-white">
+            <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-neutral-500"></i>
+        </div>
+    </div>
+
+    <div class="bg-neutral-900 border border-white/5 rounded-2xl overflow-hidden shadow-xl">
+        <div class="max-h-[600px] overflow-y-auto custom-scrollbar p-2">
+            @if($chapters->count() > 0)
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    @foreach($chapters as $chapter)
+                        <a href="{{ route('komik.read', [$comic->slug, $chapter->number]) }}" 
+                           class="group flex items-center justify-between p-4 rounded-xl bg-neutral-950 border border-white/5 hover:border-purple-500/50 hover:bg-white/5 transition-all">
+                            
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-lg bg-neutral-800 flex items-center justify-center text-neutral-500 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                                    <span class="font-bold text-sm">{{ $chapter->number }}</span>
+                                </div>
+                                <div>
+                                    <h4 class="text-white font-medium text-sm group-hover:text-purple-400 transition-colors">
+                                        {{ $chapter->title ? 'Ch. '.$chapter->number.' - '.$chapter->title : 'Chapter ' . $chapter->number }}
+                                    </h4>
+                                    <p class="text-xs text-neutral-500 mt-0.5">{{ $chapter->created_at->format('d M Y') }}</p>
+                                </div>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-5 h-5 text-neutral-600 group-hover:text-white transition-colors"></i>
+                        </a>
+                    @endforeach
+                </div>
+            @else
+                <div class="py-12 text-center">
+                    <div class="w-16 h-16 bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="file-x" class="w-8 h-8 text-neutral-600"></i>
+                    </div>
+                    <p class="text-neutral-500">Belum ada chapter yang diupload.</p>
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <div class="mb-20"></div>
+
 @endsection

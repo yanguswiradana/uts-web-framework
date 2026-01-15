@@ -24,47 +24,47 @@ class ChapterController extends Controller
         return view('admin.chapters.create', compact('comics', 'selectedComicId'));
     }
 
-    // ==========================================
-    // STORE (SIMPAN DATA BARU)
-    // ==========================================
+    // SIMPAN CHAPTER BARU
     public function store(Request $request)
     {
+        // VALIDASI KETAT & FORMAT IMAGE ONLY
         $request->validate([
-            'comic_id' => 'required',
+            'comic_id' => 'required|exists:comics,id',
             'number'   => 'required|numeric',
-            'slug'     => 'nullable|string|max:255', // Validasi string biasa
-            'content_images'   => 'required',
-            'content_images.*' => 'image|mimes:jpeg,png,jpg,webp|max:2048'
+            'slug'     => 'nullable|string|max:255',
+            // WAJIB ADA IMAGE, HARUS ARRAY, ISI ARRAY HARUS GAMBAR
+            'content_images'   => 'required|array|min:1',
+            'content_images.*' => 'image|mimes:jpeg,png,jpg,webp|max:2048' 
+        ], [
+            'comic_id.required' => 'Silakan pilih komik terlebih dahulu.',
+            'number.required'   => 'Nomor chapter wajib diisi.',
+            'content_images.required' => 'Wajib upload minimal satu gambar chapter.',
+            'content_images.*.image'  => 'File harus berupa gambar.',
+            'content_images.*.mimes'  => 'Format harus jpg, jpeg, png, atau webp.',
         ]);
 
         $data = $request->except(['content_images']);
 
-        // --- 1. LOGIKA HYBRID SLUG ---
+        // LOGIKA SLUG
         if ($request->filled('slug')) {
-            // Jika admin isi manual
             $slugCandidate = Str::slug($request->slug);
         } else {
-            // Jika kosong, generate otomatis: "chapter-{nomor}"
             $slugCandidate = 'chapter-' . $request->number;
-            // Jika ada judul tambahan, tempel di belakang: "chapter-1-prologue"
             if ($request->filled('title')) {
                 $slugCandidate .= '-' . $request->title;
             }
             $slugCandidate = Str::slug($slugCandidate);
         }
 
-        // Cek Duplikat: Jika slug sudah ada di database, tambahkan uniqid
         if (Chapter::where('slug', $slugCandidate)->exists()) {
             $slugCandidate .= '-' . uniqid();
         }
-        
         $data['slug'] = $slugCandidate;
 
-        // --- 2. UPLOAD GAMBAR (MULTIPLE) ---
+        // UPLOAD GAMBAR
         $imagePaths = [];
         if ($request->hasFile('content_images')) {
             foreach ($request->file('content_images') as $image) {
-                // Simpan ke storage/app/public/chapters
                 $path = $image->store('chapters', 'public');
                 $imagePaths[] = $path;
             }
@@ -82,36 +82,31 @@ class ChapterController extends Controller
         return view('admin.chapters.edit', compact('chapter', 'comics'));
     }
 
-    // ==========================================
-    // UPDATE (EDIT DATA)
-    // ==========================================
+    // UPDATE CHAPTER
     public function update(Request $request, Chapter $chapter)
     {
         $request->validate([
-            'comic_id' => 'required',
+            'comic_id' => 'required|exists:comics,id',
             'number'   => 'required|numeric',
             'slug'     => 'nullable|string|max:255',
+            // Validasi gambar jika ada yang diupload (nullable saat edit)
+            'content_images'   => 'nullable|array',
             'content_images.*' => 'image|mimes:jpeg,png,jpg,webp|max:2048'
         ]);
 
         $data = $request->except(['content_images']);
 
-        // --- 1. LOGIKA SLUG SAAT EDIT ---
-        // Kita hanya ubah slug jika Admin MENGETIK sesuatu di input slug.
-        // Jika dikosongkan, biarkan slug lama (agar link SEO tidak mati).
         if ($request->filled('slug')) {
             $slugCandidate = Str::slug($request->slug);
-            
-            // Cek duplikat (kecuali punya diri sendiri)
             if (Chapter::where('slug', $slugCandidate)->where('id', '!=', $chapter->id)->exists()) {
                 $slugCandidate .= '-' . uniqid();
             }
             $data['slug'] = $slugCandidate;
         }
 
-        // --- 2. UPDATE GAMBAR (REPLACE) ---
+        // Jika upload baru, replace yang lama
         if ($request->hasFile('content_images')) {
-            // Hapus gambar lama
+            // Hapus file lama fisik
             if ($chapter->content_images) {
                 foreach ($chapter->content_images as $oldImage) {
                     if(!Str::startsWith($oldImage, 'http')) {
@@ -119,7 +114,7 @@ class ChapterController extends Controller
                     }
                 }
             }
-            // Upload gambar baru
+            // Simpan baru
             $imagePaths = [];
             foreach ($request->file('content_images') as $image) {
                 $path = $image->store('chapters', 'public');
@@ -135,7 +130,6 @@ class ChapterController extends Controller
 
     public function destroy(Chapter $chapter)
     {
-        // Hapus file fisik
         if ($chapter->content_images) {
             foreach ($chapter->content_images as $image) {
                 if(!Str::startsWith($image, 'http')) {
@@ -144,7 +138,6 @@ class ChapterController extends Controller
             }
         }
         $chapter->delete();
-
         return redirect()->route('admin.chapters.index')->with('success', 'Chapter berhasil dihapus!');
     }
 }

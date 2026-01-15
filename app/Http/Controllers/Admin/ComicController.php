@@ -25,29 +25,34 @@ class ComicController extends Controller
 
     public function store(Request $request)
     {
+        // VALIDASI KETAT
         $request->validate([
-            'title' => 'required',
-            'type'  => 'required',
-            'cover' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048', // Max 2MB
-            'genres'=> 'array'
+            'title'       => 'required|string|max:255',
+            'author'      => 'required|string|max:255',
+            'description' => 'required|string',
+            'type'        => 'required|in:Manga,Manhwa,Manhua',
+            'status'      => 'required|in:Ongoing,Completed',
+            // Wajib Gambar (jpeg, png, jpg, webp) maks 2MB
+            'cover'       => 'required|image|mimes:jpeg,png,jpg,webp|max:2048', 
+            'genres'      => 'required|array|min:1', // Wajib pilih minimal 1 genre
+        ], [
+            // Custom Error Message (Opsional, biar bahasa Indonesia)
+            'title.required' => 'Judul komik wajib diisi.',
+            'cover.required' => 'Cover komik wajib diupload.',
+            'cover.image'    => 'File harus berupa gambar.',
+            'cover.mimes'    => 'Format gambar harus jpeg, png, jpg, atau webp.',
+            'genres.required'=> 'Pilih minimal satu genre.'
         ]);
 
         $data = $request->except(['cover', 'genres']);
-        $data['slug'] = Str::slug($request->title);
+        $data['slug'] = Str::slug($request->title . '-' . Str::random(5));
 
-        // --- 1. PROSES UPLOAD COVER BARU ---
         if ($request->hasFile('cover')) {
-            // File akan disimpan di: storage/app/public/comics
-            $path = $request->file('cover')->store('comics', 'public');
-            $data['cover'] = $path;
+            $data['cover'] = $request->file('cover')->store('comics', 'public');
         }
 
         $comic = Comic::create($data);
-
-        // Simpan Relasi Genre
-        if($request->has('genres')){
-            $comic->genres()->attach($request->genres);
-        }
+        $comic->genres()->attach($request->genres);
 
         return redirect()->route('admin.comics.index')->with('success', 'Komik berhasil ditambahkan!');
     }
@@ -60,43 +65,42 @@ class ComicController extends Controller
 
     public function update(Request $request, Comic $comic)
     {
+        // VALIDASI UPDATE
         $request->validate([
-            'title' => 'required',
-            'cover' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'title'       => 'required|string|max:255',
+            'author'      => 'required|string|max:255',
+            'description' => 'required|string',
+            'type'        => 'required|in:Manga,Manhwa,Manhua',
+            'status'      => 'required|in:Ongoing,Completed',
+            // Cover boleh kosong saat update (nullable), tapi KALO diisi harus gambar
+            'cover'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'genres'      => 'required|array|min:1',
         ]);
 
         $data = $request->except(['cover', 'genres']);
-        $data['slug'] = Str::slug($request->title);
+        
+        // Update slug jika judul berubah (opsional, tapi lebih baik jangan biar link SEO gak mati)
+        // $data['slug'] = Str::slug($request->title . '-' . Str::random(5)); 
 
-        // --- 2. PROSES GANTI COVER ---
         if ($request->hasFile('cover')) {
-            // Hapus gambar lama (jika ada dan bukan link internet)
+            // Hapus gambar lama
             if ($comic->cover && !Str::startsWith($comic->cover, 'http')) {
                 Storage::disk('public')->delete($comic->cover);
             }
-            
-            // Upload gambar baru
-            $path = $request->file('cover')->store('comics', 'public');
-            $data['cover'] = $path;
+            $data['cover'] = $request->file('cover')->store('comics', 'public');
         }
 
         $comic->update($data);
-
-        // Update Relasi Genre
-        if($request->has('genres')){
-            $comic->genres()->sync($request->genres);
-        }
+        $comic->genres()->sync($request->genres);
 
         return redirect()->route('admin.comics.index')->with('success', 'Komik berhasil diperbarui!');
     }
 
     public function destroy(Comic $comic)
     {
-        // --- 3. HAPUS FILE FISIK SAAT DATA DIHAPUS ---
         if ($comic->cover && !Str::startsWith($comic->cover, 'http')) {
             Storage::disk('public')->delete($comic->cover);
         }
-        
         $comic->genres()->detach();
         $comic->delete();
 

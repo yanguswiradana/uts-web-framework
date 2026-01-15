@@ -46,4 +46,16 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    // Relasi: User menyimpan banyak Komik
+    public function bookmarks()
+    {
+        return $this->belongsToMany(Comic::class, 'bookmarks', 'user_id', 'comic_id')->withTimestamps();
+    }
+    
+    // Helper: Cek apakah user sudah bookmark komik tertentu?
+    public function hasBookmarked($comicId)
+    {
+        return $this->bookmarks()->where('comic_id', $comicId)->exists();
+    }
 }

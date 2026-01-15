@@ -8,19 +8,30 @@ use Illuminate\Database\Eloquent\Model;
 class Comic extends Model
 {
     use HasFactory;
-    
+
     protected $guarded = ['id'];
 
-    // Relasi: 1 Komik punya BANYAK Chapter
+    // Relasi ke Chapter
     public function chapters()
     {
         return $this->hasMany(Chapter::class);
     }
 
-    // Relasi: 1 Komik punya BANYAK Genre
+    // Relasi ke Genre
     public function genres()
     {
-        // 'comic_genre' adalah nama tabel pivot (penghubung)
         return $this->belongsToMany(Genre::class, 'comic_genre');
+    }
+
+    // --- TAMBAHAN BARU: RELASI RATING ---
+    public function ratings()
+    {
+        return $this->hasMany(Rating::class);
+    }
+    
+    // Relasi untuk mengecek rating user tertentu (User login)
+    public function user_rating()
+    {
+        return $this->hasOne(Rating::class)->where('user_id', auth()->id());
     }
 }
