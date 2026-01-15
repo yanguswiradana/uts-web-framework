@@ -7,7 +7,7 @@
             {{-- 1. LOGO --}}
             <div class="flex items-center flex-shrink-0">
                 <a href="{{ route('home') }}" class="flex items-center space-x-2">
-                    <img src="{{ asset('images/komikin-logo.png') }}" alt="KOMIKIN Logo" class="h-10 w-auto md:h-12"> 
+                    <img src="{{ asset('images/komikin-logo.png') }}" alt="KOMIKIN Logo" class="h-24 w-auto md:h-32"> 
                 </a>
             </div>
 

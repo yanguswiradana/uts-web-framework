@@ -6,120 +6,111 @@ use App\Http\Controllers\Controller;
 use App\Models\Chapter;
 use App\Models\Comic;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage; // Penting untuk hapus gambar
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ChapterController extends Controller
 {
     public function index()
     {
-        $chapters = Chapter::with('comic')->latest()->paginate(15);
+        $chapters = Chapter::with('comic')->latest()->paginate(10);
         return view('admin.chapters.index', compact('chapters'));
     }
 
     public function create()
     {
-        $comics = Comic::orderBy('title', 'asc')->get();
-        return view('admin.chapters.create', compact('comics'));
+        $selectedComicId = request('comic_id');
+        $comics = Comic::orderBy('title')->get();
+        return view('admin.chapters.create', compact('comics', 'selectedComicId'));
     }
 
-    // ==========================================
-    // FUNGSI UTAMA UPLOAD (STORE)
-    // ==========================================
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'comic_id' => 'required|exists:comics,id',
-            'number' => 'required|numeric',
-            'title' => 'required|max:255',
-            'slug' => 'required|unique:chapters',
-            // Validasi Array Gambar (Maks 2MB per file)
-            'content_images' => 'required|array',
-            'content_images.*' => 'image|mimes:jpeg,png,jpg,webp|max:2048'
+        $request->validate([
+            'comic_id' => 'required',
+            'number'   => 'required|numeric',
+            'title'    => 'nullable|string',
+            'content_images'   => 'required', // Wajib ada gambar
+            'content_images.*' => 'image|mimes:jpeg,png,jpg,webp|max:2048' // Validasi tiap file
         ]);
 
-        // 1. Siapkan Array Penampung Path
-        $imagePaths = [];
+        $data = $request->except(['content_images']);
+        $data['slug'] = Str::slug('chapter-' . $request->number . '-' . uniqid()); // Slug unik
 
-        // 2. Loop setiap file yang diupload
+        // --- 1. PROSES MULTIPLE UPLOAD ---
+        $imagePaths = [];
         if ($request->hasFile('content_images')) {
             foreach ($request->file('content_images') as $image) {
-                // Simpan ke folder: storage/app/public/chapter-images
-                $path = $image->store('chapter-images', 'public');
+                // Simpan tiap gambar ke folder 'chapters'
+                $path = $image->store('chapters', 'public');
                 $imagePaths[] = $path;
             }
         }
+        
+        // Simpan array path ke database (Otomatis jadi JSON berkat Casts di Model)
+        $data['content_images'] = $imagePaths;
 
-        // 3. Simpan ke Database
-        Chapter::create([
-            'comic_id' => $request->comic_id,
-            'number' => $request->number,
-            'title' => $request->title,
-            'slug' => $request->slug,
-            'content_images' => $imagePaths, // Laravel otomatis ubah jadi JSON
-        ]);
+        Chapter::create($data);
 
-        return redirect()->route('admin.chapters.index')->with('success', 'Chapter berhasil diupload beserta gambarnya!');
+        return redirect()->route('admin.chapters.index')->with('success', 'Chapter berhasil diupload!');
     }
 
     public function edit(Chapter $chapter)
     {
-        $comics = Comic::orderBy('title', 'asc')->get();
+        $comics = Comic::orderBy('title')->get();
         return view('admin.chapters.edit', compact('chapter', 'comics'));
     }
 
-    // FUNGSI UPDATE (Simpel: Timpa gambar lama jika ada upload baru)
     public function update(Request $request, Chapter $chapter)
     {
-        $validated = $request->validate([
-            'comic_id' => 'required|exists:comics,id',
-            'number' => 'required|numeric',
-            'title' => 'required|max:255',
-            'slug' => 'required|unique:chapters,slug,' . $chapter->id,
-            'content_images' => 'nullable|array',
-            'content_images.*' => 'image|max:2048'
+        $request->validate([
+            'comic_id' => 'required',
+            'number'   => 'required|numeric',
+            'content_images.*' => 'image|mimes:jpeg,png,jpg,webp|max:2048'
         ]);
 
-        // Ambil data lama dulu
-        $dataToUpdate = [
-            'comic_id' => $request->comic_id,
-            'number' => $request->number,
-            'title' => $request->title,
-            'slug' => $request->slug,
-        ];
+        $data = $request->except(['content_images']);
 
-        // Jika user upload gambar baru, hapus yang lama, simpan yang baru
+        // --- 2. PROSES UPDATE (TIMPA GAMBAR LAMA) ---
+        // Logika: Jika admin upload gambar baru, semua gambar lama dihapus & diganti baru
         if ($request->hasFile('content_images')) {
             
-            // Hapus file lama dari storage (Opsional, biar hemat memori)
+            // Hapus semua file lama dari penyimpanan
             if ($chapter->content_images) {
                 foreach ($chapter->content_images as $oldImage) {
-                    Storage::disk('public')->delete($oldImage);
+                    if(!Str::startsWith($oldImage, 'http')) {
+                        Storage::disk('public')->delete($oldImage);
+                    }
                 }
             }
 
-            // Upload baru
-            $newImages = [];
+            // Upload file baru
+            $imagePaths = [];
             foreach ($request->file('content_images') as $image) {
-                $newImages[] = $image->store('chapter-images', 'public');
+                $path = $image->store('chapters', 'public');
+                $imagePaths[] = $path;
             }
-            $dataToUpdate['content_images'] = $newImages;
+            $data['content_images'] = $imagePaths;
         }
 
-        $chapter->update($dataToUpdate);
+        $chapter->update($data);
 
-        return redirect()->route('admin.chapters.index')->with('success', 'Chapter berhasil diupdate!');
+        return redirect()->route('admin.chapters.index')->with('success', 'Chapter berhasil diperbarui!');
     }
 
     public function destroy(Chapter $chapter)
     {
-        // Hapus fisik gambar saat data dihapus
+        // --- 3. HAPUS SEMUA FILE GAMBAR SAAT CHAPTER DIHAPUS ---
         if ($chapter->content_images) {
             foreach ($chapter->content_images as $image) {
-                Storage::disk('public')->delete($image);
+                if(!Str::startsWith($image, 'http')) {
+                    Storage::disk('public')->delete($image);
+                }
             }
         }
-
+        
         $chapter->delete();
-        return redirect()->route('admin.chapters.index')->with('success', 'Chapter dihapus!');
+
+        return redirect()->route('admin.chapters.index')->with('success', 'Chapter berhasil dihapus!');
     }
 }
