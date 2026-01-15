@@ -23,36 +23,44 @@
                 @error('comic_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
 
-            <div class="grid grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="block text-sm font-bold text-neutral-300 mb-2">Nomor Chapter</label>
-                    <input type="number" name="number" value="{{ old('number') }}" placeholder="Contoh: 1, 2, 10.5" step="0.1"
-                           class="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none placeholder:text-neutral-600">
+                    <input type="number" name="number" value="{{ old('number') }}" placeholder="Contoh: 1" step="0.1"
+                           class="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none">
                 </div>
                 
                 <div>
                     <label class="block text-sm font-bold text-neutral-300 mb-2">Judul (Opsional)</label>
                     <input type="text" name="title" value="{{ old('title') }}" placeholder="Contoh: The Beginning" 
-                           class="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none placeholder:text-neutral-600">
+                           class="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none">
                 </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-bold text-neutral-300 mb-2">Slug URL (Opsional)</label>
+                <input type="text" name="slug" value="{{ old('slug') }}" placeholder="Custom URL, misal: chapter-1-spesial" 
+                       class="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none placeholder:text-neutral-600">
+                <p class="text-xs text-neutral-500 mt-1">
+                    <span class="text-purple-400 font-bold">Tips:</span> Kosongkan untuk otomatis (Contoh: <code>chapter-1</code>).
+                </p>
             </div>
 
             <div>
                 <label class="block text-sm font-bold text-neutral-300 mb-2">Gambar Konten Chapter</label>
                 
-                <div class="relative border-2 border-dashed border-white/10 rounded-xl p-10 text-center hover:border-blue-500/50 hover:bg-blue-500/5 transition-all group cursor-pointer">
+                <div class="relative border-2 border-dashed border-white/10 rounded-xl p-8 text-center hover:border-blue-500/50 hover:bg-blue-500/5 transition-all group cursor-pointer">
                     <input type="file" name="content_images[]" multiple class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="image/*">
                     
                     <div class="flex flex-col items-center justify-center pointer-events-none">
-                        <div class="p-4 bg-neutral-800 rounded-full mb-3 group-hover:bg-blue-600 transition-colors">
-                            <i data-lucide="files" class="w-8 h-8 text-neutral-400 group-hover:text-white"></i>
+                        <div class="p-3 bg-neutral-800 rounded-full mb-3 group-hover:bg-blue-600 transition-colors">
+                            <i data-lucide="files" class="w-6 h-6 text-neutral-400 group-hover:text-white"></i>
                         </div>
-                        <p class="text-base font-medium text-white group-hover:text-blue-400 transition-colors">
-                            Drop gambar di sini atau klik untuk memilih
+                        <p class="text-sm font-medium text-white group-hover:text-blue-400 transition-colors">
+                            Klik atau Drag gambar ke sini
                         </p>
-                        <p class="text-sm text-neutral-500 mt-2">
-                            Bisa pilih <strong>BANYAK GAMBAR</strong> sekaligus.<br>
-                            (Tahan tombol <code>CTRL</code> saat memilih file)
+                        <p class="text-xs text-neutral-500 mt-1">
+                            Bisa pilih <strong>Banyak Gambar</strong> sekaligus (Tahan Ctrl/Shift)
                         </p>
                     </div>
                 </div>

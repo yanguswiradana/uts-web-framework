@@ -36,11 +36,18 @@
                 </div>
             </div>
 
+            <div>
+                <label class="block text-sm font-bold text-neutral-300 mb-2">Slug URL</label>
+                <input type="text" name="slug" value="{{ old('slug', $chapter->slug) }}" 
+                       class="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none">
+                <p class="text-xs text-neutral-500 mt-1">Ubah jika ingin mengganti link URL. Kosongkan untuk tetap pakai yang lama.</p>
+            </div>
+
             <div class="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 flex gap-3 items-start">
                 <i data-lucide="alert-triangle" class="w-5 h-5 text-yellow-500 shrink-0 mt-0.5"></i>
                 <div class="text-sm text-yellow-200">
-                    <strong>Perhatian:</strong> Chapter ini sudah memiliki gambar.<br>
-                    Jika Anda mengupload gambar baru di bawah ini, <u>semua gambar lama akan terhapus</u> dan digantikan dengan yang baru.
+                    <strong>Info Gambar:</strong><br>
+                    Jika Anda mengupload file baru di bawah ini, <u>seluruh gambar lama akan dihapus</u> dan diganti.
                 </div>
             </div>
 
