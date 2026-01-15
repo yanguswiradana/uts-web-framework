@@ -9,29 +9,24 @@ class Comic extends Model
 {
     use HasFactory;
 
+    // Biarkan kosong agar semua kolom bisa diisi
     protected $guarded = ['id'];
+
+    // Relasi ke Genre (PENTING)
+    public function genres()
+    {
+        return $this->belongsToMany(Genre::class, 'comic_genre');
+    }
 
     // Relasi ke Chapter
     public function chapters()
     {
         return $this->hasMany(Chapter::class);
     }
-
-    // Relasi ke Genre
-    public function genres()
-    {
-        return $this->belongsToMany(Genre::class, 'comic_genre');
-    }
-
-    // --- TAMBAHAN BARU: RELASI RATING ---
+    
+    // Relasi ke Rating
     public function ratings()
     {
         return $this->hasMany(Rating::class);
-    }
-    
-    // Relasi untuk mengecek rating user tertentu (User login)
-    public function user_rating()
-    {
-        return $this->hasOne(Rating::class)->where('user_id', auth()->id());
     }
 }

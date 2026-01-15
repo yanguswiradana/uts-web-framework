@@ -24,36 +24,26 @@ class ChapterController extends Controller
         return view('admin.chapters.create', compact('comics', 'selectedComicId'));
     }
 
-    // SIMPAN CHAPTER BARU
+    // UPDATE DI SINI: Validasi Title jadi Required
     public function store(Request $request)
     {
-        // VALIDASI KETAT & FORMAT IMAGE ONLY
         $request->validate([
             'comic_id' => 'required|exists:comics,id',
             'number'   => 'required|numeric',
+            'title'    => 'required|string|max:255', // SEKARANG WAJIB
             'slug'     => 'nullable|string|max:255',
-            // WAJIB ADA IMAGE, HARUS ARRAY, ISI ARRAY HARUS GAMBAR
             'content_images'   => 'required|array|min:1',
             'content_images.*' => 'image|mimes:jpeg,png,jpg,webp|max:2048' 
-        ], [
-            'comic_id.required' => 'Silakan pilih komik terlebih dahulu.',
-            'number.required'   => 'Nomor chapter wajib diisi.',
-            'content_images.required' => 'Wajib upload minimal satu gambar chapter.',
-            'content_images.*.image'  => 'File harus berupa gambar.',
-            'content_images.*.mimes'  => 'Format harus jpg, jpeg, png, atau webp.',
         ]);
 
         $data = $request->except(['content_images']);
 
-        // LOGIKA SLUG
+        // Logika Slug (Tetap sama)
         if ($request->filled('slug')) {
             $slugCandidate = Str::slug($request->slug);
         } else {
-            $slugCandidate = 'chapter-' . $request->number;
-            if ($request->filled('title')) {
-                $slugCandidate .= '-' . $request->title;
-            }
-            $slugCandidate = Str::slug($slugCandidate);
+            // Gabungkan Nomor dan Judul karena judul sekarang wajib
+            $slugCandidate = Str::slug('chapter-' . $request->number . '-' . $request->title);
         }
 
         if (Chapter::where('slug', $slugCandidate)->exists()) {
@@ -61,7 +51,7 @@ class ChapterController extends Controller
         }
         $data['slug'] = $slugCandidate;
 
-        // UPLOAD GAMBAR
+        // Upload Gambar (Tetap sama)
         $imagePaths = [];
         if ($request->hasFile('content_images')) {
             foreach ($request->file('content_images') as $image) {
@@ -82,14 +72,14 @@ class ChapterController extends Controller
         return view('admin.chapters.edit', compact('chapter', 'comics'));
     }
 
-    // UPDATE CHAPTER
+    // UPDATE DI SINI: Validasi Title jadi Required
     public function update(Request $request, Chapter $chapter)
     {
         $request->validate([
             'comic_id' => 'required|exists:comics,id',
             'number'   => 'required|numeric',
+            'title'    => 'required|string|max:255', // SEKARANG WAJIB
             'slug'     => 'nullable|string|max:255',
-            // Validasi gambar jika ada yang diupload (nullable saat edit)
             'content_images'   => 'nullable|array',
             'content_images.*' => 'image|mimes:jpeg,png,jpg,webp|max:2048'
         ]);
@@ -104,9 +94,7 @@ class ChapterController extends Controller
             $data['slug'] = $slugCandidate;
         }
 
-        // Jika upload baru, replace yang lama
         if ($request->hasFile('content_images')) {
-            // Hapus file lama fisik
             if ($chapter->content_images) {
                 foreach ($chapter->content_images as $oldImage) {
                     if(!Str::startsWith($oldImage, 'http')) {
@@ -114,7 +102,6 @@ class ChapterController extends Controller
                     }
                 }
             }
-            // Simpan baru
             $imagePaths = [];
             foreach ($request->file('content_images') as $image) {
                 $path = $image->store('chapters', 'public');

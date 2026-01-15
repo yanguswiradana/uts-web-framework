@@ -60,12 +60,9 @@
 
             <div>
                 <label class="block text-sm font-bold text-neutral-300 mb-2">Ganti Cover (Opsional)</label>
-                <div class="flex items-center gap-4 mb-3">
+                <div class="flex items-center gap-4">
                     <img src="{{ Str::startsWith($comic->cover, 'http') ? $comic->cover : asset('storage/' . $comic->cover) }}" class="w-20 h-28 object-cover rounded-lg border border-white/10">
-                    <div class="flex-1">
-                        <input type="file" name="cover" accept="image/*" class="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-purple-600 file:text-white hover:file:bg-purple-700">
-                        <p class="text-xs text-neutral-500 mt-1">Biarkan kosong jika tidak ingin mengubah cover.</p>
-                    </div>
+                    <input type="file" name="cover" accept="image/*" class="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none">
                 </div>
             </div>
 
