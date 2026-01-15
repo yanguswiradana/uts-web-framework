@@ -4,12 +4,6 @@
 @section('header_title', 'Manajemen Komik')
 
 @section('content')
-    @if(session('success'))
-    <div class="mb-6 bg-green-500/10 border border-green-500/20 text-green-400 p-4 rounded-xl flex items-center gap-3">
-        <i data-lucide="check-circle" class="w-5 h-5"></i>
-        {{ session('success') }}
-    </div>
-    @endif
 
     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <div>
@@ -40,7 +34,7 @@
                             <div class="flex items-center gap-4">
                                 <div class="w-10 h-14 bg-neutral-800 rounded shadow-inner overflow-hidden relative shrink-0 border border-white/5">
                                     @if($comic->cover)
-                                        <img src="{{ asset('storage/' . $comic->cover) }}" alt="{{ $comic->title }}" class="w-full h-full object-cover">
+                                        <img src="{{ Str::startsWith($comic->cover, 'http') ? $comic->cover : asset('storage/' . $comic->cover) }}" alt="{{ $comic->title }}" class="w-full h-full object-cover">
                                     @else
                                         <div class="flex items-center justify-center h-full text-xs font-bold text-neutral-600">
                                             {{ substr($comic->title, 0, 1) }}
@@ -89,14 +83,14 @@
                         </td>
                         <td class="px-6 py-4 text-right">
                             <div class="flex justify-end items-center gap-2">
-                                <a href="{{ route('admin.comics.edit', $comic->id) }}" class="p-2 bg-neutral-800 hover:bg-yellow-500/10 hover:text-yellow-500 text-neutral-400 rounded-lg transition-all border border-transparent hover:border-yellow-500/20" title="Edit">
+                                <a href="{{ route('admin.comics.edit', $comic->id) }}" class="p-2 bg-neutral-800 hover:text-yellow-500 rounded-lg transition-colors border border-transparent hover:border-yellow-500/20" title="Edit">
                                     <i data-lucide="pencil" class="w-4 h-4"></i>
                                 </a>
                                 
-                                <form action="{{ route('admin.comics.destroy', $comic->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus komik ini? Data chapter juga akan hilang.')">
+                                <form id="delete-form-{{ $comic->id }}" action="{{ route('admin.comics.destroy', $comic->id) }}" method="POST" class="inline-block">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="p-2 bg-neutral-800 hover:bg-red-500/10 hover:text-red-500 text-neutral-400 rounded-lg transition-all border border-transparent hover:border-red-500/20" title="Hapus">
+                                    <button type="button" onclick="confirmDelete('{{ $comic->id }}')" class="p-2 bg-neutral-800 hover:text-red-500 rounded-lg transition-colors border border-transparent hover:border-red-500/20" title="Hapus">
                                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                                     </button>
                                 </form>

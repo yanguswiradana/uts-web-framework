@@ -14,12 +14,6 @@
         </a>
     </div>
 
-    @if(session('success'))
-    <div class="mb-6 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-4 rounded-xl flex items-center gap-3">
-        <i data-lucide="check-circle" class="w-5 h-5"></i> {{ session('success') }}
-    </div>
-    @endif
-
     <div class="bg-neutral-900 border border-white/5 rounded-2xl overflow-hidden shadow-xl">
         <table class="w-full text-left text-sm text-neutral-400">
             <thead class="bg-white/[0.02] text-neutral-300 font-medium uppercase text-xs border-b border-white/5">
@@ -38,9 +32,10 @@
                         <a href="{{ route('admin.genres.edit', $genre->id) }}" class="p-2 bg-neutral-800 hover:text-yellow-500 rounded-lg transition-colors">
                             <i data-lucide="pencil" class="w-4 h-4"></i>
                         </a>
-                        <form action="{{ route('admin.genres.destroy', $genre->id) }}" method="POST" onsubmit="return confirm('Hapus genre ini?')">
+                        
+                        <form id="delete-form-{{ $genre->id }}" action="{{ route('admin.genres.destroy', $genre->id) }}" method="POST" class="inline-block">
                             @csrf @method('DELETE')
-                            <button class="p-2 bg-neutral-800 hover:text-red-500 rounded-lg transition-colors">
+                            <button type="button" onclick="confirmDelete('{{ $genre->id }}')" class="p-2 bg-neutral-800 hover:text-red-500 rounded-lg transition-colors">
                                 <i data-lucide="trash-2" class="w-4 h-4"></i>
                             </button>
                         </form>

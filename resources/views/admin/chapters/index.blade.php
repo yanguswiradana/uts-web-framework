@@ -14,12 +14,6 @@
         </a>
     </div>
 
-    @if(session('success'))
-    <div class="mb-6 bg-blue-500/10 border border-blue-500/20 text-blue-400 p-4 rounded-xl flex items-center gap-3">
-        <i data-lucide="check-circle" class="w-5 h-5"></i> {{ session('success') }}
-    </div>
-    @endif
-
     <div class="bg-neutral-900 border border-white/5 rounded-2xl overflow-hidden shadow-xl">
         <table class="w-full text-left text-sm text-neutral-400">
             <thead class="bg-white/[0.02] text-neutral-300 font-medium uppercase text-xs border-b border-white/5">
@@ -40,10 +34,11 @@
                     <td class="px-6 py-4"><span class="bg-neutral-800 px-2 py-1 rounded text-xs font-mono">Ch. {{ $chapter->number }}</span></td>
                     <td class="px-6 py-4 text-xs">{{ $chapter->created_at->format('d M Y') }}</td>
                     <td class="px-6 py-4 text-right flex justify-end gap-2">
-                        <a href="{{ route('admin.chapters.edit', $chapter->id) }}" class="p-2 bg-neutral-800 hover:text-yellow-500 rounded-lg"><i data-lucide="pencil" class="w-4 h-4"></i></a>
-                        <form action="{{ route('admin.chapters.destroy', $chapter->id) }}" method="POST" onsubmit="return confirm('Hapus chapter ini?')">
+                        <a href="{{ route('admin.chapters.edit', $chapter->id) }}" class="p-2 bg-neutral-800 hover:text-yellow-500 rounded-lg transition-colors"><i data-lucide="pencil" class="w-4 h-4"></i></a>
+                        
+                        <form id="delete-form-{{ $chapter->id }}" action="{{ route('admin.chapters.destroy', $chapter->id) }}" method="POST" class="inline-block">
                             @csrf @method('DELETE')
-                            <button class="p-2 bg-neutral-800 hover:text-red-500 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            <button type="button" onclick="confirmDelete('{{ $chapter->id }}')" class="p-2 bg-neutral-800 hover:text-red-500 rounded-lg transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </form>
                     </td>
                 </tr>

@@ -5,21 +5,6 @@
 
 @section('content')
 
-    {{-- Alert Error (Jika hapus diri sendiri) --}}
-    @if(session('error'))
-    <div class="mb-6 bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl flex items-center gap-3">
-        <i data-lucide="alert-circle" class="w-5 h-5"></i> {{ session('error') }}
-    </div>
-    @endif
-
-    {{-- Alert Success --}}
-    @if(session('success'))
-    <div class="mb-6 bg-pink-500/10 border border-pink-500/20 text-pink-400 p-4 rounded-xl flex items-center gap-3">
-        <i data-lucide="check-circle" class="w-5 h-5"></i> {{ session('success') }}
-    </div>
-    @endif
-
-    {{-- HEADER: JUDUL & TOMBOL TAMBAH --}}
     <div class="flex justify-between items-center mb-6">
         <div>
             <h2 class="text-2xl font-bold text-white">Daftar Pengguna</h2>
@@ -41,7 +26,7 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-white/5">
-                @foreach($users as $user)
+                @forelse($users as $user)
                 <tr class="hover:bg-white/[0.02] transition-colors">
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
@@ -49,6 +34,11 @@
                                 {{ substr($user->name, 0, 1) }}
                             </div>
                             <span class="text-white font-medium">{{ $user->name }}</span>
+                            
+                            {{-- Tanda (You) jika ini user yang sedang login --}}
+                            @if(auth()->id() === $user->id)
+                                <span class="text-[10px] bg-neutral-700 text-white px-1.5 rounded">You</span>
+                            @endif
                         </div>
                     </td>
                     <td class="px-6 py-4">{{ $user->email }}</td>
@@ -60,20 +50,34 @@
                         @endif
                     </td>
                     <td class="px-6 py-4 text-right flex justify-end gap-2">
-                        <a href="{{ route('admin.users.edit', $user->id) }}" class="p-2 bg-neutral-800 hover:text-yellow-500 rounded-lg"><i data-lucide="user-cog" class="w-4 h-4"></i></a>
+                        {{-- TOMBOL EDIT --}}
+                        <a href="{{ route('admin.users.edit', $user->id) }}" class="p-2 bg-neutral-800 hover:text-yellow-500 rounded-lg transition-colors" title="Edit User">
+                            <i data-lucide="user-cog" class="w-4 h-4"></i>
+                        </a>
                         
-                        {{-- Logika: Tidak boleh hapus diri sendiri --}}
-                        @if(auth()->id() !== $user->id) 
-                            <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Hapus user ini selamanya?')">
-                                @csrf @method('DELETE')
-                                <button class="p-2 bg-neutral-800 hover:text-red-500 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        {{-- TOMBOL HAPUS (Hanya muncul jika BUKAN user yang sedang login) --}}
+                        @if(auth()->id() !== $user->id)
+                            <form id="delete-form-{{ $user->id }}" action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline-block">
+                                @csrf 
+                                @method('DELETE')
+                                <button type="button" onclick="confirmDelete('{{ $user->id }}')" class="p-2 bg-neutral-800 hover:text-red-500 rounded-lg transition-colors" title="Hapus User">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
                             </form>
                         @endif
                     </td>
                 </tr>
-                @endforeach
+                @empty
+                <tr>
+                    <td colspan="4" class="px-6 py-10 text-center text-neutral-500">
+                        Tidak ada data user lain.
+                    </td>
+                </tr>
+                @endforelse
             </tbody>
         </table>
-        <div class="px-6 py-4 border-t border-white/5">{{ $users->links('pagination::tailwind') }}</div>
+        <div class="px-6 py-4 border-t border-white/5 bg-neutral-900">
+            {{ $users->links('pagination::tailwind') }}
+        </div>
     </div>
 @endsection
