@@ -20,9 +20,8 @@
             <table class="w-full text-left text-sm text-neutral-400">
                 <thead class="bg-white/[0.02] text-neutral-300 font-medium uppercase text-xs tracking-wider border-b border-white/5">
                     <tr>
-                        <th class="px-6 py-4">Judul Komik</th>
-                        <th class="px-6 py-4">Tipe</th>
-                        <th class="px-6 py-4">Genre</th>
+                        <th class="px-6 py-4">Cover & Info</th>
+                        <th class="px-6 py-4">Slug (URL)</th> <th class="px-6 py-4">Genre</th>
                         <th class="px-6 py-4">Status</th>
                         <th class="px-6 py-4 text-right">Aksi</th>
                     </tr>
@@ -32,12 +31,14 @@
                     <tr class="hover:bg-white/[0.02] transition-colors group">
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-4">
-                                <div class="w-10 h-14 bg-neutral-800 rounded shadow-inner overflow-hidden relative shrink-0 border border-white/5">
+                                <div class="w-12 h-16 bg-neutral-800 rounded-lg shadow-inner overflow-hidden relative shrink-0 border border-white/5">
                                     @if($comic->cover)
-                                        <img src="{{ Str::startsWith($comic->cover, 'http') ? $comic->cover : asset('storage/' . $comic->cover) }}" alt="{{ $comic->title }}" class="w-full h-full object-cover">
+                                        <img src="{{ Str::startsWith($comic->cover, 'http') ? $comic->cover : asset('storage/' . $comic->cover) }}" 
+                                             alt="{{ $comic->title }}" 
+                                             class="w-full h-full object-cover">
                                     @else
                                         <div class="flex items-center justify-center h-full text-xs font-bold text-neutral-600">
-                                            {{ substr($comic->title, 0, 1) }}
+                                            No IMG
                                         </div>
                                     @endif
                                 </div>
@@ -46,21 +47,23 @@
                                     <div class="font-bold text-white text-base group-hover:text-purple-400 transition-colors">
                                         {{ $comic->title }}
                                     </div>
-                                    <div class="text-xs text-neutral-500 mt-0.5">
-                                        {{ $comic->slug }}
+                                    <div class="text-xs text-neutral-500 mt-1">
+                                        {{ $comic->type }}
                                     </div>
                                 </div>
                             </div>
                         </td>
+                        
                         <td class="px-6 py-4">
-                            <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-neutral-800 border border-white/10 text-white">
-                                {{ $comic->type }}
-                            </span>
+                            <code class="text-xs font-mono text-purple-400 bg-purple-500/10 px-2 py-1 rounded select-all">
+                                {{ $comic->slug }}
+                            </code>
                         </td>
+
                         <td class="px-6 py-4">
                             <div class="flex flex-wrap gap-1">
                                 @foreach($comic->genres as $genre)
-                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-neutral-800 border border-white/10 text-neutral-400">
                                         {{ $genre->name }}
                                     </span>
                                 @endforeach
@@ -69,11 +72,11 @@
                         <td class="px-6 py-4">
                             @if($comic->status == 'Ongoing')
                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 text-green-400 text-xs font-medium border border-green-500/20">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> Ongoing
+                                    <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> On
                                 </span>
                             @elseif($comic->status == 'Finished')
                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-medium border border-blue-500/20">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Finished
+                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> End
                                 </span>
                             @else
                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-yellow-500/10 text-yellow-400 text-xs font-medium border border-yellow-500/20">
@@ -83,14 +86,13 @@
                         </td>
                         <td class="px-6 py-4 text-right">
                             <div class="flex justify-end items-center gap-2">
-                                <a href="{{ route('admin.comics.edit', $comic->id) }}" class="p-2 bg-neutral-800 hover:text-yellow-500 rounded-lg transition-colors border border-transparent hover:border-yellow-500/20" title="Edit">
+                                <a href="{{ route('admin.comics.edit', $comic->id) }}" class="p-2 bg-neutral-800 hover:text-yellow-500 rounded-lg transition-colors border border-transparent hover:border-yellow-500/20">
                                     <i data-lucide="pencil" class="w-4 h-4"></i>
                                 </a>
                                 
                                 <form id="delete-form-{{ $comic->id }}" action="{{ route('admin.comics.destroy', $comic->id) }}" method="POST" class="inline-block">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="button" onclick="confirmDelete('{{ $comic->id }}')" class="p-2 bg-neutral-800 hover:text-red-500 rounded-lg transition-colors border border-transparent hover:border-red-500/20" title="Hapus">
+                                    @csrf @method('DELETE')
+                                    <button type="button" onclick="confirmDelete('{{ $comic->id }}')" class="p-2 bg-neutral-800 hover:text-red-500 rounded-lg transition-colors border border-transparent hover:border-red-500/20">
                                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                                     </button>
                                 </form>
@@ -100,11 +102,7 @@
                     @empty
                     <tr>
                         <td colspan="5" class="px-6 py-20 text-center text-neutral-500">
-                            <div class="flex flex-col items-center justify-center opacity-50">
-                                <i data-lucide="folder-open" class="w-12 h-12 mb-4 text-neutral-600"></i>
-                                <p class="text-lg font-medium">Belum ada data komik</p>
-                                <p class="text-sm">Silakan tambahkan komik baru terlebih dahulu.</p>
-                            </div>
+                            Belum ada data komik.
                         </td>
                     </tr>
                     @endforelse
