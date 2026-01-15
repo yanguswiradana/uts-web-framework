@@ -11,10 +11,26 @@
     </a>
 
     <div class="bg-neutral-900 border border-white/5 rounded-2xl p-6 md:p-8 shadow-xl">
-        <form action="{{ route('admin.comics.store') }}" method="POST">
+        <form action="{{ route('admin.comics.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                
+                <div class="col-span-2">
+                    <label class="block text-sm font-bold text-neutral-300 mb-2">Cover Komik (Sampul)</label>
+                    <div class="flex items-center gap-4">
+                        <input type="file" name="cover" 
+                               class="block w-full text-sm text-neutral-400
+                                      file:mr-4 file:py-2.5 file:px-4
+                                      file:rounded-xl file:border-0
+                                      file:text-sm file:font-semibold
+                                      file:bg-purple-600 file:text-white
+                                      hover:file:bg-purple-500
+                                      cursor-pointer bg-neutral-950 border border-white/10 rounded-xl">
+                    </div>
+                    <p class="text-xs text-neutral-500 mt-2">*Format: JPG, PNG, WEBP. Maks: 2MB.</p>
+                </div>
+
                 <div class="col-span-2">
                     <label class="block text-sm font-bold text-neutral-300 mb-2">Judul Komik</label>
                     <input type="text" name="title" value="{{ old('title') }}" 
@@ -68,7 +84,6 @@
                     @foreach($genres as $genre)
                     <label class="relative flex items-center group cursor-pointer">
                         <input type="checkbox" name="genres[]" value="{{ $genre->id }}" class="peer sr-only">
-                        
                         <div class="w-full px-4 py-2 rounded-lg border border-white/10 bg-neutral-900 text-neutral-400 text-sm font-medium transition-all
                                     peer-checked:bg-purple-600 peer-checked:text-white peer-checked:border-purple-500 peer-checked:shadow-lg peer-checked:shadow-purple-900/50
                                     group-hover:border-purple-500/50">

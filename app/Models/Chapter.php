@@ -8,8 +8,16 @@ use Illuminate\Database\Eloquent\Model;
 class Chapter extends Model
 {
     use HasFactory;
+
+    // Kita pakai guarded id saja biar tidak perlu tulis satu-satu kolomnya
     protected $guarded = ['id'];
 
+    protected $casts = [
+        // MAGIC: Mengubah kolom JSON di database menjadi Array PHP otomatis
+        'content_images' => 'array', 
+    ];
+
+    // Relasi: Chapter milik 1 Komik
     public function comic()
     {
         return $this->belongsTo(Comic::class);

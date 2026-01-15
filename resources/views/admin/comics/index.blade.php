@@ -39,10 +39,15 @@
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-4">
                                 <div class="w-10 h-14 bg-neutral-800 rounded shadow-inner overflow-hidden relative shrink-0 border border-white/5">
-                                    <div class="flex items-center justify-center h-full text-xs font-bold text-neutral-600">
-                                        {{ substr($comic->title, 0, 1) }}
-                                    </div>
+                                    @if($comic->cover)
+                                        <img src="{{ asset('storage/' . $comic->cover) }}" alt="{{ $comic->title }}" class="w-full h-full object-cover">
+                                    @else
+                                        <div class="flex items-center justify-center h-full text-xs font-bold text-neutral-600">
+                                            {{ substr($comic->title, 0, 1) }}
+                                        </div>
+                                    @endif
                                 </div>
+                                
                                 <div>
                                     <div class="font-bold text-white text-base group-hover:text-purple-400 transition-colors">
                                         {{ $comic->title }}
@@ -72,9 +77,13 @@
                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 text-green-400 text-xs font-medium border border-green-500/20">
                                     <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> Ongoing
                                 </span>
-                            @else
+                            @elseif($comic->status == 'Finished')
                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-medium border border-blue-500/20">
                                     <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Finished
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-yellow-500/10 text-yellow-400 text-xs font-medium border border-yellow-500/20">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span> Hiatus
                                 </span>
                             @endif
                         </td>

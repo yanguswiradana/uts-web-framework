@@ -4,11 +4,31 @@
 @section('header_title', 'Manajemen Pengguna')
 
 @section('content')
+
+    {{-- Alert Error (Jika hapus diri sendiri) --}}
+    @if(session('error'))
+    <div class="mb-6 bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl flex items-center gap-3">
+        <i data-lucide="alert-circle" class="w-5 h-5"></i> {{ session('error') }}
+    </div>
+    @endif
+
+    {{-- Alert Success --}}
     @if(session('success'))
     <div class="mb-6 bg-pink-500/10 border border-pink-500/20 text-pink-400 p-4 rounded-xl flex items-center gap-3">
         <i data-lucide="check-circle" class="w-5 h-5"></i> {{ session('success') }}
     </div>
     @endif
+
+    {{-- HEADER: JUDUL & TOMBOL TAMBAH --}}
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h2 class="text-2xl font-bold text-white">Daftar Pengguna</h2>
+            <p class="text-neutral-400 text-sm">Kelola akses dan data user.</p>
+        </div>
+        <a href="{{ route('admin.users.create') }}" class="bg-pink-600 hover:bg-pink-700 text-white px-5 py-2.5 rounded-xl font-medium transition-colors flex items-center gap-2 shadow-lg shadow-pink-900/20">
+            <i data-lucide="user-plus" class="w-4 h-4"></i> Tambah User
+        </a>
+    </div>
 
     <div class="bg-neutral-900 border border-white/5 rounded-2xl overflow-hidden shadow-xl">
         <table class="w-full text-left text-sm text-neutral-400">
@@ -41,7 +61,10 @@
                     </td>
                     <td class="px-6 py-4 text-right flex justify-end gap-2">
                         <a href="{{ route('admin.users.edit', $user->id) }}" class="p-2 bg-neutral-800 hover:text-yellow-500 rounded-lg"><i data-lucide="user-cog" class="w-4 h-4"></i></a>
-                        @if(auth()->id() !== $user->id) <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Hapus user ini?')">
+                        
+                        {{-- Logika: Tidak boleh hapus diri sendiri --}}
+                        @if(auth()->id() !== $user->id) 
+                            <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Hapus user ini selamanya?')">
                                 @csrf @method('DELETE')
                                 <button class="p-2 bg-neutral-800 hover:text-red-500 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                             </form>

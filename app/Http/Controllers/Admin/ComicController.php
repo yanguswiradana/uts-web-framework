@@ -6,12 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Comic;
 use App\Models\Genre;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage; // Wajib import ini
 
 class ComicController extends Controller
 {
     public function index()
     {
-        // with('genres') untuk optimasi query (Eager Loading)
         $comics = Comic::with('genres')->latest()->paginate(10);
         return view('admin.comics.index', compact('comics'));
     }
@@ -30,8 +30,16 @@ class ComicController extends Controller
             'type' => 'required',
             'status' => 'required',
             'author' => 'required',
-            'genres' => 'array' // Array ID dari checkbox
+            'cover' => 'nullable|image|max:2048', // Validasi Cover (Max 2MB)
+            'genres' => 'array'
         ]);
+
+        // LOGIKA UPLOAD COVER
+        if ($request->hasFile('cover')) {
+            // Simpan ke storage/app/public/covers
+            $path = $request->file('cover')->store('covers', 'public');
+            $validated['cover'] = $path;
+        }
 
         $comic = Comic::create($validated);
 
@@ -56,8 +64,22 @@ class ComicController extends Controller
             'type' => 'required',
             'status' => 'required',
             'author' => 'required',
+            'cover' => 'nullable|image|max:2048', // Validasi Cover
             'genres' => 'array'
         ]);
+
+        // LOGIKA UPDATE COVER
+        if ($request->hasFile('cover')) {
+            
+            // 1. Hapus cover lama dari storage jika ada
+            if ($comic->cover && Storage::disk('public')->exists($comic->cover)) {
+                Storage::disk('public')->delete($comic->cover);
+            }
+            
+            // 2. Upload cover baru
+            $path = $request->file('cover')->store('covers', 'public');
+            $validated['cover'] = $path;
+        }
 
         $comic->update($validated);
 
@@ -70,8 +92,15 @@ class ComicController extends Controller
 
     public function destroy(Comic $comic)
     {
-        $comic->genres()->detach(); // Lepas relasi genre dulu
+        // 1. Hapus File Cover
+        if ($comic->cover && Storage::disk('public')->exists($comic->cover)) {
+            Storage::disk('public')->delete($comic->cover);
+        }
+
+        // 2. Lepas Relasi & Hapus Data
+        $comic->genres()->detach();
         $comic->delete();
+        
         return redirect()->route('admin.comics.index')->with('success', 'Komik dihapus!');
     }
 }
