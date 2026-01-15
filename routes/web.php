@@ -1,9 +1,18 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
+// Controller Frontend
 use App\Http\Controllers\KomikController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\AdminController;
+
+// Controller Backend (Admin)
+use App\Http\Controllers\Admin\LoginController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ComicController;
+use App\Http\Controllers\Admin\ChapterController;
+use App\Http\Controllers\Admin\GenreController;
+use App\Http\Controllers\Admin\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -12,50 +21,51 @@ use App\Http\Controllers\AdminController;
 */
 
 // ==========================================
-// 1. PUBLIC ROUTES (Frontend Pengunjung)
+// A. FRONTEND (PENGUNJUNG)
 // ==========================================
-Route::get('/', [KomikController::class, 'home'])->name('home');
-Route::get('/explore', [KomikController::class, 'index'])->name('explore.index');
-Route::get('/library', [KomikController::class, 'library'])->name('library.index');
-Route::get('/komik/{slug}', [KomikController::class, 'show'])->name('komik.show');
-Route::get('/komik/{slug}/read/{chapter}', [KomikController::class, 'read'])->name('komik.read');
+Route::controller(KomikController::class)->group(function() {
+    Route::get('/', 'home')->name('home');
+    Route::get('/explore', 'index')->name('explore.index');
+    Route::get('/library', 'library')->name('library.index');
+    Route::get('/komik/{slug}', 'show')->name('komik.show');
+    Route::get('/komik/{slug}/read/{chapter}', 'read')->name('komik.read');
+});
 
 // ==========================================
-// 2. AUTH ROUTES (Login/Register User Biasa)
+// B. AUTHENTICATION (LOGIN/REGISTER USER BIASA)
 // ==========================================
-// Note: Pastikan kamu punya route POST untuk proses loginnya juga nanti
-Route::get('/login', [AuthController::class, 'login'])->name('login');
-Route::get('/register', [AuthController::class, 'register'])->name('register');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::controller(AuthController::class)->group(function() {
+    Route::get('/login', 'login')->name('login');
+    Route::post('/login', 'authenticate')->name('login.submit');
+    Route::get('/register', 'register')->name('register');
+    Route::post('/register', 'store')->name('register.submit');
+    Route::post('/logout', 'logout')->name('logout');
+});
 
-
 // ==========================================
-// 3. ADMIN ROUTES (Backend Dashboard)
+// C. BACKEND ADMIN (DASHBOARD)
 // ==========================================
-Route::prefix('admin')->group(function () {
+Route::prefix('admin')->name('admin.')->group(function () {
     
-    // A. Route Tamu Admin (Belum Login)
+    // 1. Route Tamu Admin (Belum Login)
     Route::middleware('guest')->group(function () {
-        Route::get('/login', [AdminController::class, 'index'])->name('admin.login');
-        Route::post('/login', [AdminController::class, 'authenticate'])->name('admin.login.submit');
+        Route::get('/login', [LoginController::class, 'index'])->name('login');
+        Route::post('/login', [LoginController::class, 'authenticate'])->name('login.submit');
     });
 
-    // B. Route Khusus Admin (Sudah Login + Middleware 'is_admin')
+    // 2. Route Khusus Admin (Sudah Login + Cek Role)
+    // Pastikan middleware 'is_admin' ada, atau ganti 'auth' saja
     Route::middleware(['auth', 'is_admin'])->group(function () {
         
-        // Dashboard Utama
-        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/settings', [DashboardController::class, 'settings'])->name('settings');
 
-        // Manajemen Konten (Sesuai Menu Sidebar)
-        Route::get('/comics', [AdminController::class, 'comics'])->name('admin.comics.index');
-        Route::get('/chapters', [AdminController::class, 'chapters'])->name('admin.chapters.index');
-        Route::get('/genres', [AdminController::class, 'genres'])->name('admin.genres.index');
+        // CRUD Resource
+        Route::resource('comics', ComicController::class);
+        Route::resource('chapters', ChapterController::class);
+        Route::resource('genres', GenreController::class);
+        Route::resource('users', UserController::class);
 
-        // Manajemen User & Sistem
-        Route::get('/users', [AdminController::class, 'users'])->name('admin.users.index');
-        Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
-
-        // Logout
-        Route::post('/logout', [AdminController::class, 'logout'])->name('admin.logout');
+        Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
     });
 });
