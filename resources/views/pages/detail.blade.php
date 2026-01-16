@@ -48,9 +48,12 @@
                         <p class="text-neutral-500 text-xs uppercase font-bold mb-1">Total Chapter</p>
                         <p class="text-white font-bold text-lg">{{ $comic->chapters_count }}</p>
                     </div>
+                    
                     <div>
                         <p class="text-neutral-500 text-xs uppercase font-bold mb-1">Rilis</p>
-                        <p class="text-white font-bold text-lg">{{ $comic->created_at->format('Y') }}</p>
+                        <p class="text-white font-bold text-lg">
+                            {{ $comic->release_year ?? $comic->created_at->format('Y') }}
+                        </p>
                     </div>
                     
                     <div x-data="{ openRating: false }" class="relative">
@@ -119,7 +122,7 @@
 
                 <div class="flex gap-3 mt-auto">
                     @if($chapters->count() > 0)
-                        <a href="{{ route('komik.read', [$comic->slug, $chapters->first()->number]) }}" 
+                        <a href="{{ route('komik.read', [$comic->slug, $chapters->last()->number]) }}" 
                            class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-purple-900/40 transition-all flex items-center justify-center gap-2 hover:-translate-y-0.5">
                             <i data-lucide="book-open" class="w-5 h-5"></i>
                             <span>Mulai Baca</span>
