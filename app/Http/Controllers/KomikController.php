@@ -201,6 +201,8 @@ class KomikController extends Controller
             'chapters' => $chapters,
             'comments' => $chapter->comments, // Kirim data komentar ke view
         ]);
+
+        
     }
 
     /**
@@ -254,4 +256,6 @@ class KomikController extends Controller
 
         return back()->with('success', 'Komentar berhasil dikirim!');
     }
+
+    
 }

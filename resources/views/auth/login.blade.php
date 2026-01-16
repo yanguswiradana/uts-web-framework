@@ -45,7 +45,6 @@
                 <div class="space-y-2">
                     <div class="flex justify-between items-center">
                         <label class="text-xs font-bold text-neutral-400 uppercase tracking-wider">Password</label>
-                        <a href="#" class="text-xs text-purple-400 hover:text-white transition-colors">Lupa Password?</a>
                     </div>
                     <div class="relative group">
                         <input type="password" name="password" required placeholder="••••••••"

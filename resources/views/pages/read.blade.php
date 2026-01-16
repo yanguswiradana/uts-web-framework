@@ -1,4 +1,4 @@
-@extends('layouts.read')
+@extends('layouts.app')
 
 @section('title', 'Baca ' . $comic->title . ' Ch. ' . $chapterNumber)
 
@@ -103,19 +103,76 @@
                     </div>
                 @endauth
 
-                <div class="space-y-6">
+                <div class="space-y-8">
                     @forelse($comments as $comment)
-                        <div class="flex gap-3">
-                            <div class="w-8 h-8 rounded-full bg-neutral-800 flex-shrink-0 flex items-center justify-center font-bold text-neutral-400 text-xs border border-white/5">
-                                {{ substr($comment->user->name, 0, 1) }}
-                            </div>
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="font-bold text-white text-sm">{{ $comment->user->name }}</span>
-                                    <span class="text-[10px] text-neutral-600">{{ $comment->created_at->diffForHumans() }}</span>
+                        
+                        <div x-data="{ openReply: false }">
+                            
+                            <div class="flex gap-3 group">
+                                <div class="w-10 h-10 rounded-full bg-neutral-800 flex-shrink-0 flex items-center justify-center font-bold text-neutral-400 text-sm border border-white/5">
+                                    {{ substr($comment->user->name, 0, 1) }}
                                 </div>
-                                <p class="text-neutral-300 text-sm leading-relaxed">{{ $comment->body }}</p>
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="font-bold text-white text-sm">{{ $comment->user->name }}</span>
+                                        <span class="text-[10px] text-neutral-500">{{ $comment->created_at->diffForHumans() }}</span>
+                                    </div>
+                                    <p class="text-neutral-300 text-sm leading-relaxed mb-2">{{ $comment->body }}</p>
+                                    
+                                    @auth
+                                        <button @click="openReply = !openReply" class="text-xs text-purple-400 font-bold hover:text-purple-300 transition-colors flex items-center gap-1 opacity-60 hover:opacity-100">
+                                            <i data-lucide="reply" class="w-3 h-3"></i> Balas
+                                        </button>
+                                    @endauth
+                                </div>
                             </div>
+
+                            @auth
+                                <div x-show="openReply" class="ml-12 mt-3" style="display: none;" 
+                                     x-transition:enter="transition ease-out duration-200"
+                                     x-transition:enter-start="opacity-0 -translate-y-2"
+                                     x-transition:enter-end="opacity-100 translate-y-0">
+                                    
+                                    <form action="{{ route('chapter.comment', $chapter->id) }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="parent_id" value="{{ $comment->id }}">
+                                        <div class="flex gap-3">
+                                            <div class="w-8 h-8 rounded-full bg-purple-600/50 flex-shrink-0 flex items-center justify-center font-bold text-white text-xs">
+                                                {{ substr(Auth::user()->name, 0, 1) }}
+                                            </div>
+                                            <div class="flex-1">
+                                                <textarea name="body" rows="1" placeholder="Balas komentar {{ $comment->user->name }}..." class="w-full bg-neutral-900 border border-white/10 rounded-lg p-3 text-white text-xs focus:outline-none focus:border-purple-500 transition-colors resize-none" required></textarea>
+                                                <div class="flex justify-end gap-2 mt-2">
+                                                    <button type="button" @click="openReply = false" class="text-neutral-500 text-xs hover:text-white">Batal</button>
+                                                    <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-1.5 rounded-md font-bold text-xs transition-all">Kirim</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            @endauth
+
+                            @if($comment->replies->count() > 0)
+                                <div class="ml-12 mt-4 space-y-4 border-l-2 border-white/5 pl-4">
+                                    @foreach($comment->replies as $reply)
+                                        <div class="flex gap-3">
+                                            <div class="w-8 h-8 rounded-full bg-neutral-800 flex-shrink-0 flex items-center justify-center font-bold text-neutral-500 text-xs border border-white/5">
+                                                {{ substr($reply->user->name, 0, 1) }}
+                                            </div>
+                                            <div class="flex-1">
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <span class="font-bold text-white text-xs">{{ $reply->user->name }}</span>
+                                                    <span class="text-[10px] text-neutral-600">{{ $reply->created_at->diffForHumans() }}</span>
+                                                </div>
+                                                <p class="text-neutral-400 text-xs leading-relaxed">
+                                                    <span class="text-purple-500/50 mr-1 font-bold">@</span>{{ $reply->body }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
+
                         </div>
                     @empty
                         <p class="text-center text-neutral-600 text-sm italic py-4">Belum ada komentar.</p>
