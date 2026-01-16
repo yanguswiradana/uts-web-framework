@@ -4,31 +4,30 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-20">
 
-            {{-- 1. LOGO HEADER --}}
+{{-- 1. LOGO HEADER (VERSI BESAR & TANPA PEMBUNGKUS) --}}
             <div class="flex items-center flex-shrink-0">
                 <a href="{{ route('home') }}" class="flex items-center gap-3 group">
                     
                     @if(isset($web_config['app_logo']) && $web_config['app_logo'])
-                        {{-- LOGO DARI DATABASE (Admin Settings) --}}
+                        {{-- LOGO DARI DATABASE --}}
+                        {{-- Hapus rounded, shadow, ubah object-cover jadi contain, perbesar ukuran --}}
                         <img src="{{ asset('storage/' . $web_config['app_logo']) }}" 
-                            alt="Logo" 
-                            class="w-12 h-12 md:w-14 md:h-14 rounded-xl object-cover shadow-lg shadow-purple-900/20 group-hover:scale-105 transition-transform">
+                             alt="Logo" 
+                             class="w-16 h-16 md:w-20 md:h-20 object-contain group-hover:scale-110 transition-transform duration-300">
                     @else
-                        {{-- LOGO STATIC (public/images/komikin-logo.png) --}}
+                        {{-- LOGO STATIC --}}
                         <img src="{{ asset('images/komikin-logo.png') }}" 
-                            alt="Logo" 
-                            class="w-12 h-12 md:w-14 md:h-14 rounded-xl object-cover shadow-lg shadow-purple-900/20 group-hover:scale-105 transition-transform"
-                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                             alt="Logo" 
+                             class="w-16 h-16 md:w-20 md:h-20 object-contain group-hover:scale-110 transition-transform duration-300"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                         
-                        {{-- Fallback Icon (Jika gambar static juga tidak ada) --}}
-                        <div class="hidden w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl items-center justify-center shadow-lg shadow-purple-900/20 group-hover:scale-105 transition-transform">
-                            <i data-lucide="zap" class="w-6 h-6 md:w-8 md:h-8 text-white fill-white"></i>
+                        {{-- Fallback Icon (Tanpa Kotak Background) --}}
+                        {{-- Hapus bg-gradient, rounded, shadow --}}
+                        <div class="hidden w-16 h-16 md:w-20 md:h-20 items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                            {{-- Ubah warna ikon jadi ungu agar terlihat --}}
+                            <i data-lucide="zap" class="w-10 h-10 md:w-12 md:h-12 text-purple-500 fill-purple-500"></i>
                         </div>
                     @endif
-                    
-                    <span class="text-xl md:text-2xl font-bold tracking-tight text-white">
-                        {{ $web_config['app_name'] ?? 'KOMIKIN' }}
-                    </span>
                 </a>
             </div>
 

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.read')
 
 @section('title', 'Baca ' . $comic->title . ' Ch. ' . $chapterNumber)
 
