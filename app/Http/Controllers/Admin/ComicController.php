@@ -30,20 +30,26 @@ class ComicController extends Controller
     {
         // 1. Validasi
         $request->validate([
-            'title'       => 'required|string|max:255',
-            'author'      => 'required|string|max:255',
-            'description' => 'required|string',
-            'type'        => 'required|in:Manga,Manhwa,Manhua',
-            'status'      => 'required|in:Ongoing,Completed',
-            'cover'       => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'genres'      => 'required|array|min:1', // Wajib pilih minimal 1
+            'title'        => 'required|string|max:255',
+            'author'       => 'required|string|max:255',
+            // Validasi Tahun: Minimal 1900, Maksimal Tahun Depan
+            'release_year' => 'required|integer|min:1900|max:'.(date('Y')+1), 
+            'description'  => 'required|string',
+            'type'         => 'required|in:Manga,Manhwa,Manhua',
+            'status'       => 'required|in:Ongoing,Completed',
+            'cover'        => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'genres'       => 'required|array|min:1', 
+        ], [
+            'release_year.required' => 'Tahun rilis wajib diisi.',
+            'release_year.integer'  => 'Tahun harus berupa angka.',
+            'release_year.min'      => 'Tahun tidak valid (terlalu lama).',
+            'genres.required'       => 'Pilih minimal satu genre.',
         ]);
 
-        // 2. Pisahkan data 'cover' dan 'genres' dari data utama
-        // Agar tidak error "Column genres not found"
+        // 2. Pisahkan data 'cover' dan 'genres' 
         $data = $request->except(['cover', 'genres']);
         
-        // 3. Buat Slug Otomatis
+        // 3. Buat Slug
         $data['slug'] = Str::slug($request->title . '-' . Str::random(5));
 
         // 4. Upload Cover
@@ -51,11 +57,10 @@ class ComicController extends Controller
             $data['cover'] = $request->file('cover')->store('comics', 'public');
         }
 
-        // 5. Simpan Data Komik Dulu
+        // 5. Simpan Komik (termasuk release_year yang ada di $data)
         $comic = Comic::create($data);
 
-        // 6. Baru Simpan Genre (Relasi Many-to-Many)
-        // Kita gunakan attach() untuk data baru
+        // 6. Simpan Relasi Genre
         $comic->genres()->attach($request->genres);
 
         return redirect()->route('admin.comics.index')->with('success', 'Komik berhasil ditambahkan!');
@@ -73,21 +78,20 @@ class ComicController extends Controller
     public function update(Request $request, Comic $comic)
     {
         $request->validate([
-            'title'       => 'required|string|max:255',
-            'author'      => 'required|string|max:255',
-            'description' => 'required|string',
-            'type'        => 'required|in:Manga,Manhwa,Manhua',
-            'status'      => 'required|in:Ongoing,Completed',
-            'cover'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'genres'      => 'required|array|min:1',
+            'title'        => 'required|string|max:255',
+            'author'       => 'required|string|max:255',
+            'release_year' => 'required|integer|min:1900|max:'.(date('Y')+1),
+            'description'  => 'required|string',
+            'type'         => 'required|in:Manga,Manhwa,Manhua',
+            'status'       => 'required|in:Ongoing,Completed',
+            'cover'        => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'genres'       => 'required|array|min:1',
         ]);
 
-        // Pisahkan data lagi
         $data = $request->except(['cover', 'genres']);
         
-        // Update Gambar jika ada upload baru
+        // Update Gambar jika ada
         if ($request->hasFile('cover')) {
-            // Hapus gambar lama
             if ($comic->cover && !Str::startsWith($comic->cover, 'http')) {
                 Storage::disk('public')->delete($comic->cover);
             }
@@ -97,7 +101,7 @@ class ComicController extends Controller
         // Update Tabel Komik
         $comic->update($data);
 
-        // Update Genre (Pakai sync untuk menimpa genre lama dengan yang baru)
+        // Update Genre
         $comic->genres()->sync($request->genres);
 
         return redirect()->route('admin.comics.index')->with('success', 'Komik berhasil diperbarui!');
@@ -108,7 +112,6 @@ class ComicController extends Controller
         if ($comic->cover && !Str::startsWith($comic->cover, 'http')) {
             Storage::disk('public')->delete($comic->cover);
         }
-        // Hapus relasi genre dulu sebelum hapus komik
         $comic->genres()->detach();
         $comic->delete();
 

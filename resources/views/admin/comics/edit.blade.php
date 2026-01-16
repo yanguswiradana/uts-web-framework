@@ -24,6 +24,15 @@
                         <input type="text" name="author" value="{{ old('author', $comic->author) }}" required 
                                class="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none">
                     </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-neutral-300 mb-2">Tahun Rilis <span class="text-red-500">*</span></label>
+                        <input type="number" name="release_year" value="{{ old('release_year', $comic->release_year) }}" required 
+                               class="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-bold text-neutral-300 mb-2">Tipe <span class="text-red-500">*</span></label>
                         <select name="type" required class="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none">
@@ -32,9 +41,6 @@
                             <option value="Manhua" {{ $comic->type == 'Manhua' ? 'selected' : '' }}>Manhua</option>
                         </select>
                     </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-bold text-neutral-300 mb-2">Status <span class="text-red-500">*</span></label>
                         <select name="status" required class="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none">
@@ -42,12 +48,13 @@
                             <option value="Completed" {{ $comic->status == 'Completed' ? 'selected' : '' }}>Completed</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="block text-sm font-bold text-neutral-300 mb-2">Ganti Cover (Opsional)</label>
-                        <div class="flex items-center gap-4">
-                            <img src="{{ Str::startsWith($comic->cover, 'http') ? $comic->cover : asset('storage/' . $comic->cover) }}" class="w-16 h-20 object-cover rounded-lg border border-white/10">
-                            <input type="file" name="cover" accept="image/*" class="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none">
-                        </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-neutral-300 mb-2">Ganti Cover (Opsional)</label>
+                    <div class="flex items-center gap-4">
+                        <img src="{{ Str::startsWith($comic->cover, 'http') ? $comic->cover : asset('storage/' . $comic->cover) }}" class="w-16 h-20 object-cover rounded-lg border border-white/10">
+                        <input type="file" name="cover" accept="image/*" class="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none">
                     </div>
                 </div>
             </div>
