@@ -26,8 +26,14 @@
             <div class="flex-1 flex flex-col">
                 <div class="mb-4">
                     <span class="text-purple-400 font-bold tracking-wider text-xs uppercase mb-2 block">{{ $comic->type }}</span>
-                    <h1 class="text-3xl md:text-5xl font-bold text-white leading-tight mb-4">{{ $comic->title }}</h1>
                     
+                    <h1 class="text-3xl md:text-5xl font-bold text-white leading-tight mb-2">{{ $comic->title }}</h1>
+                    
+                    <div class="flex items-center gap-2 text-neutral-400 text-sm mb-4">
+                        <i data-lucide="pen-tool" class="w-4 h-4 text-neutral-500"></i>
+                        <span class="font-medium">Author: <span class="text-white">{{ $comic->author }}</span></span>
+                    </div>
+
                     <div class="flex flex-wrap gap-2 mb-6">
                         @foreach($comic->genres as $genre)
                             <a href="{{ route('explore.index', ['genre[]' => $genre->name]) }}" class="px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 text-xs text-neutral-300 hover:text-white transition-colors">

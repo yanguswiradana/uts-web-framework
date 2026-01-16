@@ -4,10 +4,31 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-20">
 
-            {{-- 1. LOGO --}}
+            {{-- 1. LOGO HEADER --}}
             <div class="flex items-center flex-shrink-0">
-                <a href="{{ route('home') }}" class="flex items-center space-x-2">
-                    <img src="{{ asset('images/komikin-logo.png') }}" alt="KOMIKIN Logo" class="h-24 w-auto md:h-32"> 
+                <a href="{{ route('home') }}" class="flex items-center gap-3 group">
+                    
+                    @if(isset($web_config['app_logo']) && $web_config['app_logo'])
+                        {{-- LOGO DARI DATABASE (Admin Settings) --}}
+                        <img src="{{ asset('storage/' . $web_config['app_logo']) }}" 
+                            alt="Logo" 
+                            class="w-12 h-12 md:w-14 md:h-14 rounded-xl object-cover shadow-lg shadow-purple-900/20 group-hover:scale-105 transition-transform">
+                    @else
+                        {{-- LOGO STATIC (public/images/komikin-logo.png) --}}
+                        <img src="{{ asset('images/komikin-logo.png') }}" 
+                            alt="Logo" 
+                            class="w-12 h-12 md:w-14 md:h-14 rounded-xl object-cover shadow-lg shadow-purple-900/20 group-hover:scale-105 transition-transform"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        
+                        {{-- Fallback Icon (Jika gambar static juga tidak ada) --}}
+                        <div class="hidden w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl items-center justify-center shadow-lg shadow-purple-900/20 group-hover:scale-105 transition-transform">
+                            <i data-lucide="zap" class="w-6 h-6 md:w-8 md:h-8 text-white fill-white"></i>
+                        </div>
+                    @endif
+                    
+                    <span class="text-xl md:text-2xl font-bold tracking-tight text-white">
+                        {{ $web_config['app_name'] ?? 'KOMIKIN' }}
+                    </span>
                 </a>
             </div>
 
