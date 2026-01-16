@@ -11,110 +11,159 @@ use Illuminate\Support\Str;
 
 class ComicController extends Controller
 {
+    /**
+     * Tampilkan daftar komik
+     */
     public function index()
     {
-        $comics = Comic::with('genres')->latest()->paginate(10);
+        $comics = Comic::withCount('chapters')->latest()->paginate(10);
         return view('admin.comics.index', compact('comics'));
     }
 
+    /**
+     * Form tambah komik
+     */
     public function create()
     {
-        $genres = Genre::all();
+        $genres = Genre::orderBy('name')->get();
         return view('admin.comics.create', compact('genres'));
     }
 
-    // ==========================================
-    // STORE (SIMPAN BARU)
-    // ==========================================
+    /**
+     * Simpan komik baru
+     */
     public function store(Request $request)
     {
-        // 1. Validasi
         $request->validate([
-            'title'        => 'required|string|max:255',
-            'author'       => 'required|string|max:255',
-            // Validasi Tahun: Minimal 1900, Maksimal Tahun Depan
-            'release_year' => 'required|integer|min:1900|max:'.(date('Y')+1), 
-            'description'  => 'required|string',
-            'type'         => 'required|in:Manga,Manhwa,Manhua',
-            'status'       => 'required|in:Ongoing,Completed',
-            'cover'        => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'genres'       => 'required|array|min:1', 
-        ], [
-            'release_year.required' => 'Tahun rilis wajib diisi.',
-            'release_year.integer'  => 'Tahun harus berupa angka.',
-            'release_year.min'      => 'Tahun tidak valid (terlalu lama).',
-            'genres.required'       => 'Pilih minimal satu genre.',
+            'title' => 'required|string|max:255',
+            'author' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'type' => 'required|in:Manga,Manhwa,Manhua',
+            'status' => 'required|in:Ongoing,Completed',
+            'cover' => 'required|image|max:2048', // Max 2MB
+            'release_year' => 'nullable|numeric|min:1900|max:'.(date('Y')+1),
+            'genres' => 'array'
         ]);
 
-        // 2. Pisahkan data 'cover' dan 'genres' 
-        $data = $request->except(['cover', 'genres']);
-        
-        // 3. Buat Slug
-        $data['slug'] = Str::slug($request->title . '-' . Str::random(5));
-
-        // 4. Upload Cover
+        $coverPath = null;
         if ($request->hasFile('cover')) {
-            $data['cover'] = $request->file('cover')->store('comics', 'public');
+            $coverPath = $request->file('cover')->store('covers', 'public');
         }
 
-        // 5. Simpan Komik (termasuk release_year yang ada di $data)
-        $comic = Comic::create($data);
+        $comic = Comic::create([
+            'title' => $request->title,
+            'slug' => Str::slug($request->title . '-' . Str::random(5)),
+            'author' => $request->author,
+            'description' => $request->description,
+            'type' => $request->type,
+            'status' => $request->status,
+            'cover' => $coverPath,
+            'release_year' => $request->release_year,
+        ]);
 
-        // 6. Simpan Relasi Genre
-        $comic->genres()->attach($request->genres);
+        // Attach Genres
+        if ($request->has('genres')) {
+            $comic->genres()->attach($request->genres);
+        }
 
-        return redirect()->route('admin.comics.index')->with('success', 'Komik berhasil ditambahkan!');
+        return redirect()->route('admin.comics.index')->with('success', 'Komik berhasil ditambahkan');
     }
 
+    /**
+     * Form edit komik
+     */
     public function edit(Comic $comic)
     {
-        $genres = Genre::all();
+        $genres = Genre::orderBy('name')->get();
         return view('admin.comics.edit', compact('comic', 'genres'));
     }
 
-    // ==========================================
-    // UPDATE (EDIT DATA)
-    // ==========================================
+    /**
+     * Update komik
+     */
     public function update(Request $request, Comic $comic)
     {
         $request->validate([
-            'title'        => 'required|string|max:255',
-            'author'       => 'required|string|max:255',
-            'release_year' => 'required|integer|min:1900|max:'.(date('Y')+1),
-            'description'  => 'required|string',
-            'type'         => 'required|in:Manga,Manhwa,Manhua',
-            'status'       => 'required|in:Ongoing,Completed',
-            'cover'        => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'genres'       => 'required|array|min:1',
+            'title' => 'required|string|max:255',
+            'author' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'type' => 'required|in:Manga,Manhwa,Manhua',
+            'status' => 'required|in:Ongoing,Completed',
+            'cover' => 'nullable|image|max:2048',
+            'release_year' => 'nullable|numeric',
+            'genres' => 'array'
         ]);
 
         $data = $request->except(['cover', 'genres']);
-        
-        // Update Gambar jika ada
+        $data['slug'] = Str::slug($request->title);
+
+        // Handle Cover Update
         if ($request->hasFile('cover')) {
-            if ($comic->cover && !Str::startsWith($comic->cover, 'http')) {
-                Storage::disk('public')->delete($comic->cover);
+            // Hapus cover lama jika bukan URL eksternal
+            if ($comic->cover && !Str::startsWith($comic->cover, ['http://', 'https://'])) {
+                if (Storage::disk('public')->exists($comic->cover)) {
+                    Storage::disk('public')->delete($comic->cover);
+                }
             }
-            $data['cover'] = $request->file('cover')->store('comics', 'public');
+            // Upload baru
+            $data['cover'] = $request->file('cover')->store('covers', 'public');
         }
 
-        // Update Tabel Komik
         $comic->update($data);
 
-        // Update Genre
-        $comic->genres()->sync($request->genres);
+        // Sync Genres
+        if ($request->has('genres')) {
+            $comic->genres()->sync($request->genres);
+        }
 
-        return redirect()->route('admin.comics.index')->with('success', 'Komik berhasil diperbarui!');
+        return redirect()->route('admin.comics.index')->with('success', 'Komik berhasil diperbarui');
     }
 
+    /**
+     * Hapus komik (AMAN UNTUK SEEDER & DATA MANUAL)
+     */
     public function destroy(Comic $comic)
     {
-        if ($comic->cover && !Str::startsWith($comic->cover, 'http')) {
-            Storage::disk('public')->delete($comic->cover);
+        // 1. BERSIHKAN GAMBAR CHAPTER TERLEBIH DAHULU
+        // Kita loop semua chapter milik komik ini dan hapus gambarnya satu per satu
+        foreach ($comic->chapters as $chapter) {
+            $images = $chapter->content_images;
+
+            // Logika Decode Cerdas (Sama seperti ChapterController)
+            if (is_string($images)) {
+                $decoded = json_decode($images, true);
+                if (is_string($decoded)) {
+                    $decoded = json_decode($decoded, true);
+                }
+                $images = is_array($decoded) ? $decoded : [];
+            } elseif (!is_array($images)) {
+                $images = [];
+            }
+
+            // Hapus file fisik gambar chapter
+            foreach ($images as $image) {
+                if (!Str::startsWith($image, ['http://', 'https://'])) {
+                    if (Storage::disk('public')->exists($image)) {
+                        Storage::disk('public')->delete($image);
+                    }
+                }
+            }
+            
+            // Hapus record chapter (Optional: sebenarnya cascade database sudah menangani ini, 
+            // tapi manual delete memastikan event model lain jalan jika ada)
+            $chapter->delete(); 
         }
-        $comic->genres()->detach();
+
+        // 2. HAPUS COVER KOMIK
+        if ($comic->cover && !Str::startsWith($comic->cover, ['http://', 'https://'])) {
+            if (Storage::disk('public')->exists($comic->cover)) {
+                Storage::disk('public')->delete($comic->cover);
+            }
+        }
+
+        // 3. Hapus data Komik dari Database
         $comic->delete();
 
-        return redirect()->route('admin.comics.index')->with('success', 'Komik berhasil dihapus!');
+        return back()->with('success', 'Komik dan semua chapternya berhasil dihapus');
     }
 }
