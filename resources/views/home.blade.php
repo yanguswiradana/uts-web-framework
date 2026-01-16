@@ -4,7 +4,7 @@
 
 @section('content')
 
-    <div class="relative bg-neutral-900 border border-white/5 rounded-3xl p-8 md:p-12 mb-10 overflow-hidden shadow-2xl">
+    <div class="relative bg-neutral-900 border border-white/5 rounded-3xl p-8 md:p-12 mb-6 overflow-hidden shadow-2xl">
         <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] -mr-32 -mt-32 pointer-events-none"></div>
         <div class="absolute bottom-0 left-0 w-[300px] h-[300px] bg-blue-600/10 rounded-full blur-[100px] -ml-20 -mb-20 pointer-events-none"></div>
         
@@ -33,6 +33,35 @@
             </div>
         </div>
     </div>
+
+    <div class="py-8">
+    <div class="relative rounded-3xl overflow-hidden border border-white/10 group">
+        <div class="absolute inset-0 bg-[url('https://c4.wallpaperflare.com/wallpaper/295/163/719/anime-anime-boys-picture-in-picture-kimetsu-no-yaiba-kamado-tanjir%C5%8D-hd-wallpaper-preview.jpg')] bg-cover bg-center"></div>
+        
+        <div class="absolute inset-0 bg-gradient-to-r from-neutral-950 via-neutral-950/80 to-transparent"></div>
+        
+        <div class="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div class="max-w-xl">
+                <span class="bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded mb-3 inline-block">FITUR BARU</span>
+                <h2 class="text-3xl md:text-4xl font-black text-white mb-3 italic">BOSAN BACA KOMIK?</h2>
+                <p class="text-neutral-300 text-sm md:text-base mb-6 leading-relaxed">
+                    Sekarang kamu bisa nonton anime favorit langsung di Komikin! Streaming lancar via Youtube, update setiap hari.
+                </p>
+                
+                <a href="{{ route('anime.index') }}" class="inline-flex items-center gap-2 bg-white text-neutral-950 px-6 py-3 rounded-xl font-bold hover:bg-neutral-200 transition-colors">
+                    <i data-lucide="tv" class="w-5 h-5"></i>
+                    Mulai Nonton Anime
+                </a>
+            </div>
+            
+            <div class="hidden md:block">
+                <div class="w-24 h-24 rounded-full bg-red-600/20 border border-red-500/30 flex items-center justify-center animate-bounce">
+                    <i data-lucide="play" class="w-10 h-10 text-red-500 fill-current ml-1"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
     <section class="mb-16" x-data="{ activeTab: 'Manga' }">
         
