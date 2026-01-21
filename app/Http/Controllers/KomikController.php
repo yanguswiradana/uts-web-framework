@@ -7,60 +7,57 @@ use App\Models\Comic;
 use App\Models\Chapter;
 use App\Models\Genre;
 use App\Models\Rating;
-use App\Models\Comment; // Jangan lupa import Model Comment
+use App\Models\Comment; 
 use Illuminate\Support\Facades\Auth;
 
 class KomikController extends Controller
 {
     /**
      * HALAMAN HOME
-     * Menampilkan Tab Populer (Manga/Manhwa/Manhua) dan Latest Updates
      */
     public function home()
     {
-        // Query Dasar: Ambil komik beserta rata-rata rating
         $baseQuery = Comic::with('genres')
             ->withCount('chapters')
             ->withAvg('ratings', 'stars');
 
-        // 1. Data untuk Tab Populer (Manga) - Ambil 10 teratas
+        // 1. Tab Populer (Manga)
         $manga = (clone $baseQuery)->where('type', 'Manga')
-            ->orderBy('ratings_avg_stars', 'desc') // Urutkan rating tertinggi
+            ->orderBy('ratings_avg_stars', 'desc')
             ->take(10)->get();
 
-        // 2. Data untuk Tab Populer (Manhwa)
+        // 2. Tab Populer (Manhwa)
         $manhwa = (clone $baseQuery)->where('type', 'Manhwa')
             ->orderBy('ratings_avg_stars', 'desc')
             ->take(10)->get();
 
-        // 3. Data untuk Tab Populer (Manhua)
+        // 3. Tab Populer (Manhua)
         $manhua = (clone $baseQuery)->where('type', 'Manhua')
             ->orderBy('ratings_avg_stars', 'desc')
             ->take(10)->get();
 
-        // 4. Data Latest Updates (Semua Tipe) - Diurutkan berdasarkan chapter terbaru
-        $latestUpdates = Chapter::with(['comic.genres']) // Eager load relasi
+        // 4. Latest Updates
+        $latestUpdates = Chapter::with(['comic.genres'])
             ->latest()
-            ->take(15) // Ambil 15 update terakhir
+            ->take(15)
             ->get()
             ->map(function ($chapter) {
                 $comic = $chapter->comic;
                 if ($comic) {
-                    // Load rating manual karena ini dari model Chapter ke Comic
                     $comic->loadAvg('ratings', 'stars');
                     $comic->latest_chapter = $chapter->number;
                     $comic->updated_time = $chapter->created_at->diffForHumans();
                 }
                 return $comic;
             })
-            ->unique('id') // Hindari duplikat komik jika update banyak chapter sekaligus
+            ->unique('id')
             ->filter();
 
         return view('home', compact('manga', 'manhwa', 'manhua', 'latestUpdates'));
     }
 
     /**
-     * HALAMAN EXPLORE (PENCARIAN & FILTER)
+     * HALAMAN EXPLORE
      */
     public function index(Request $request)
     {
@@ -68,7 +65,6 @@ class KomikController extends Controller
                       ->withCount('chapters')
                       ->withAvg('ratings', 'stars');
 
-        // Filter Genre
         if ($request->has('genre')) {
             $genres = (array) $request->input('genre');
             if (!empty($genres)) {
@@ -78,22 +74,18 @@ class KomikController extends Controller
             }
         }
 
-        // Filter Status
         if ($request->has('status') && $request->status != 'Semua') {
             $query->where('status', $request->status);
         }
 
-        // Filter Tipe
         if ($request->has('type')) {
             $query->where('type', $request->type);
         }
 
-        // Search Judul
         if ($request->filled('search')) {
             $query->where('title', 'like', '%' . $request->search . '%');
         }
 
-        // Sorting
         $sort = $request->input('sort', 'Terbaru');
         switch ($sort) {
             case 'Populer (All Time)':
@@ -122,13 +114,12 @@ class KomikController extends Controller
     }
 
     /**
-     * HALAMAN LIBRARY (BOOKMARKS)
+     * HALAMAN LIBRARY
      */
     public function library(Request $request)
     {
         $user = Auth::user();
         
-        // Ambil dari relasi bookmarks milik user
         $query = $user->bookmarks()
                       ->withCount('chapters')
                       ->withAvg('ratings', 'stars');
@@ -137,7 +128,6 @@ class KomikController extends Controller
             $query->where('title', 'like', '%' . $request->search . '%');
         }
 
-        // Urutkan berdasarkan waktu ditambahkan ke library
         $favoriteComics = $query->orderByPivot('created_at', 'desc')->get();
 
         return view('pages.library', compact('favoriteComics'));
@@ -154,7 +144,7 @@ class KomikController extends Controller
             }])
             ->withCount('chapters')
             ->withAvg('ratings', 'stars')
-            ->with(['user_rating']) // Cek apakah user login sudah rate ini
+            ->with(['user_rating'])
             ->firstOrFail();
 
         $chapters = $comic->chapters;
@@ -163,30 +153,36 @@ class KomikController extends Controller
     }
 
     /**
-     * HALAMAN BACA (READER) DENGAN KOMENTAR
+     * HALAMAN BACA (READER) - UPDATED FOR NESTED COMMENTS
      */
     public function read($slug, $chapterNumber)
     {
         $comic = Comic::where('slug', $slug)->firstOrFail();
         
-        // Load Chapter + Komentar + User Pemilik Komentar
         $chapter = $comic->chapters()
                          ->where('number', $chapterNumber)
-                         ->with(['comments.user']) // Eager Load agar performa cepat
                          ->firstOrFail();
 
-        // Navigasi Prev/Next
+        // UPDATE LOGIC KOMENTAR:
+        // Hanya ambil komentar INDUK (parent_id = null)
+        // Eager load User dan Balasan (Replies) beserta usernya
+        $comments = $chapter->comments()
+                            ->whereNull('parent_id') 
+                            ->with(['user', 'replies.user']) 
+                            ->latest()
+                            ->get();
+
+        // Navigasi
         $prevChapter = $comic->chapters()->where('number', '<', $chapterNumber)->orderBy('number', 'desc')->first();
         $nextChapter = $comic->chapters()->where('number', '>', $chapterNumber)->orderBy('number', 'asc')->first();
         $chapters = $comic->chapters()->orderBy('number', 'desc')->get();
 
-        // Decode Gambar JSON
+        // Decode Gambar
         $chapterImages = $chapter->content_images ?? [];
         if (is_string($chapterImages)) {
             $chapterImages = json_decode($chapterImages, true);
         }
         
-        // Pastikan path gambar benar (support URL luar atau Storage lokal)
         $chapterImages = array_map(function($path) {
             return str_starts_with($path, 'http') ? $path : asset('storage/' . $path);
         }, $chapterImages ?? []);
@@ -199,10 +195,8 @@ class KomikController extends Controller
             'prevChapter' => $prevChapter ? $prevChapter->number : null,
             'nextChapter' => $nextChapter ? $nextChapter->number : null,
             'chapters' => $chapters,
-            'comments' => $chapter->comments, // Kirim data komentar ke view
+            'comments' => $comments, // Kirim komentar yang sudah difilter
         ]);
-
-        
     }
 
     /**
@@ -239,23 +233,37 @@ class KomikController extends Controller
     }
 
     /**
-     * ACTION: POST COMMENT
+     * ACTION: POST COMMENT - UPDATED FOR AJAX & REPLIES
      */
     public function postComment(Request $request, $chapterId)
     {
         $request->validate([
-            'body' => 'required|string|max:1000', // Maksimal 1000 karakter
+            'body' => 'required|string|max:1000',
+            'parent_id' => 'nullable|exists:comments,id' // Validasi ID Induk
         ]);
 
-        // Simpan Komentar
-        Comment::create([
+        $comment = Comment::create([
             'user_id' => Auth::id(),
             'chapter_id' => $chapterId,
-            'body' => $request->body
+            'body' => $request->body,
+            'parent_id' => $request->parent_id // Simpan Parent ID jika ada (Balasan)
         ]);
 
+        // Load data user untuk dikirim balik ke JS
+        $comment->load('user');
+
+        // Jika request datang dari AJAX (Fetch/Axios), kembalikan JSON
+        if ($request->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Komentar berhasil dikirim!',
+                'comment' => $comment, 
+                'user_initial' => substr($comment->user->name, 0, 1),
+                'time_ago' => 'Baru saja' // Karena baru dibuat
+            ]);
+        }
+
+        // Fallback jika JS mati (Reload Halaman)
         return back()->with('success', 'Komentar berhasil dikirim!');
     }
-
-    
 }
