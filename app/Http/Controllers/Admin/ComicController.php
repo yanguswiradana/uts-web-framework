@@ -12,11 +12,26 @@ use Illuminate\Support\Str;
 class ComicController extends Controller
 {
     /**
-     * Tampilkan daftar komik
+     * Tampilkan daftar komik dengan fitur SEARCH & FILTER
      */
-    public function index()
+    public function index(Request $request)
     {
-        $comics = Comic::withCount('chapters')->latest()->paginate(10);
+        // Query Dasar (Eager load genres & count chapters)
+        $query = Comic::with('genres')->withCount('chapters')->latest();
+
+        // 1. Filter Pencarian Judul
+        if ($request->filled('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%');
+        }
+
+        // 2. Filter Tipe (Manga/Manhwa/Manhua)
+        if ($request->filled('type') && in_array($request->type, ['Manga', 'Manhwa', 'Manhua'])) {
+            $query->where('type', $request->type);
+        }
+
+        // Pagination 10 item + Simpan Query String (agar filter tidak hilang saat ganti halaman)
+        $comics = $query->paginate(10)->withQueryString();
+
         return view('admin.comics.index', compact('comics'));
     }
 
@@ -125,11 +140,10 @@ class ComicController extends Controller
     public function destroy(Comic $comic)
     {
         // 1. BERSIHKAN GAMBAR CHAPTER TERLEBIH DAHULU
-        // Kita loop semua chapter milik komik ini dan hapus gambarnya satu per satu
         foreach ($comic->chapters as $chapter) {
             $images = $chapter->content_images;
 
-            // Logika Decode Cerdas (Sama seperti ChapterController)
+            // Logika Decode Cerdas
             if (is_string($images)) {
                 $decoded = json_decode($images, true);
                 if (is_string($decoded)) {
@@ -149,8 +163,6 @@ class ComicController extends Controller
                 }
             }
             
-            // Hapus record chapter (Optional: sebenarnya cascade database sudah menangani ini, 
-            // tapi manual delete memastikan event model lain jalan jika ada)
             $chapter->delete(); 
         }
 

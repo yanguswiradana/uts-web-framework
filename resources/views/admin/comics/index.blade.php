@@ -5,7 +5,7 @@
 
 @section('content')
 
-    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
             <h2 class="text-2xl font-bold text-white">Daftar Komik</h2>
             <p class="text-neutral-400 text-sm">Kelola semua judul komik yang tersedia.</p>
@@ -15,13 +15,49 @@
         </a>
     </div>
 
+    <div class="flex flex-col md:flex-row gap-4 mb-6 justify-between items-end md:items-center">
+        
+        <div class="flex bg-neutral-900 p-1 rounded-xl border border-white/5 overflow-x-auto max-w-full">
+            <a href="{{ route('admin.comics.index', array_merge(request()->all(), ['type' => null, 'page' => null])) }}" 
+               class="px-4 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all {{ !request('type') ? 'bg-purple-600 text-white shadow-lg' : 'text-neutral-400 hover:text-white hover:bg-white/5' }}">
+               Semua
+            </a>
+            <a href="{{ route('admin.comics.index', array_merge(request()->all(), ['type' => 'Manga', 'page' => null])) }}" 
+               class="px-4 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all {{ request('type') == 'Manga' ? 'bg-purple-600 text-white shadow-lg' : 'text-neutral-400 hover:text-white hover:bg-white/5' }}">
+               Manga
+            </a>
+            <a href="{{ route('admin.comics.index', array_merge(request()->all(), ['type' => 'Manhwa', 'page' => null])) }}" 
+               class="px-4 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all {{ request('type') == 'Manhwa' ? 'bg-purple-600 text-white shadow-lg' : 'text-neutral-400 hover:text-white hover:bg-white/5' }}">
+               Manhwa
+            </a>
+            <a href="{{ route('admin.comics.index', array_merge(request()->all(), ['type' => 'Manhua', 'page' => null])) }}" 
+               class="px-4 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all {{ request('type') == 'Manhua' ? 'bg-purple-600 text-white shadow-lg' : 'text-neutral-400 hover:text-white hover:bg-white/5' }}">
+               Manhua
+            </a>
+        </div>
+
+        <div class="w-full md:w-72">
+            <form action="{{ route('admin.comics.index') }}" method="GET">
+                @if(request('type'))
+                    <input type="hidden" name="type" value="{{ request('type') }}">
+                @endif
+                
+                <div class="relative">
+                    <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500"></i>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari judul komik..." class="w-full bg-neutral-900 border border-white/5 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-purple-500/50 transition-colors">
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="bg-neutral-900 border border-white/5 rounded-2xl overflow-hidden shadow-xl">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm text-neutral-400">
                 <thead class="bg-white/[0.02] text-neutral-300 font-medium uppercase text-xs tracking-wider border-b border-white/5">
                     <tr>
                         <th class="px-6 py-4">Cover & Info</th>
-                        <th class="px-6 py-4">Slug (URL)</th> <th class="px-6 py-4">Genre</th>
+                        <th class="px-6 py-4">Slug (URL)</th> 
+                        <th class="px-6 py-4">Genre</th>
                         <th class="px-6 py-4">Status</th>
                         <th class="px-6 py-4 text-right">Aksi</th>
                     </tr>
@@ -102,7 +138,14 @@
                     @empty
                     <tr>
                         <td colspan="5" class="px-6 py-20 text-center text-neutral-500">
-                            Belum ada data komik.
+                            <div class="flex flex-col items-center justify-center">
+                                <i data-lucide="search-x" class="w-12 h-12 text-neutral-700 mb-3"></i>
+                                <p class="text-lg font-medium text-neutral-400">Data tidak ditemukan</p>
+                                <p class="text-xs mt-1">Coba ubah filter atau kata kunci pencarian.</p>
+                                @if(request('type') || request('search'))
+                                    <a href="{{ route('admin.comics.index') }}" class="mt-4 text-purple-400 hover:underline text-xs font-bold">Reset Filter</a>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                     @endforelse

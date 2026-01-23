@@ -35,36 +35,35 @@
     </div>
 
     <div class="py-8">
-    <div class="relative rounded-3xl overflow-hidden border border-white/10 group">
-        <div class="absolute inset-0 bg-[url('https://c4.wallpaperflare.com/wallpaper/295/163/719/anime-anime-boys-picture-in-picture-kimetsu-no-yaiba-kamado-tanjir%C5%8D-hd-wallpaper-preview.jpg')] bg-cover bg-center"></div>
-        
-        <div class="absolute inset-0 bg-gradient-to-r from-neutral-950 via-neutral-950/80 to-transparent"></div>
-        
-        <div class="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div class="max-w-xl">
-                <span class="bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded mb-3 inline-block">FITUR BARU</span>
-                <h2 class="text-3xl md:text-4xl font-black text-white mb-3 italic">BOSAN BACA KOMIK?</h2>
-                <p class="text-neutral-300 text-sm md:text-base mb-6 leading-relaxed">
-                    Sekarang kamu bisa nonton anime favorit langsung di Komikin! Streaming lancar via Youtube, update setiap hari.
-                </p>
-                
-                <a href="{{ route('anime.index') }}" class="inline-flex items-center gap-2 bg-white text-neutral-950 px-6 py-3 rounded-xl font-bold hover:bg-neutral-200 transition-colors">
-                    <i data-lucide="tv" class="w-5 h-5"></i>
-                    Mulai Nonton Anime
-                </a>
-            </div>
+        <div class="relative rounded-3xl overflow-hidden border border-white/10 group">
+            <div class="absolute inset-0 bg-[url('https://c4.wallpaperflare.com/wallpaper/295/163/719/anime-anime-boys-picture-in-picture-kimetsu-no-yaiba-kamado-tanjir%C5%8D-hd-wallpaper-preview.jpg')] bg-cover bg-center"></div>
             
-            <div class="hidden md:block">
-                <div class="w-24 h-24 rounded-full bg-red-600/20 border border-red-500/30 flex items-center justify-center animate-bounce">
-                    <i data-lucide="play" class="w-10 h-10 text-red-500 fill-current ml-1"></i>
+            <div class="absolute inset-0 bg-gradient-to-r from-neutral-950 via-neutral-950/80 to-transparent"></div>
+            
+            <div class="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div class="max-w-xl">
+                    <span class="bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded mb-3 inline-block">FITUR BARU</span>
+                    <h2 class="text-3xl md:text-4xl font-black text-white mb-3 italic">BOSAN BACA KOMIK?</h2>
+                    <p class="text-neutral-300 text-sm md:text-base mb-6 leading-relaxed">
+                        Sekarang kamu bisa nonton anime favorit langsung di Komikin! Streaming lancar via Youtube, update setiap hari.
+                    </p>
+                    
+                    <a href="{{ route('anime.index') }}" class="inline-flex items-center gap-2 bg-white text-neutral-950 px-6 py-3 rounded-xl font-bold hover:bg-neutral-200 transition-colors">
+                        <i data-lucide="tv" class="w-5 h-5"></i>
+                        Mulai Nonton Anime
+                    </a>
+                </div>
+                
+                <div class="hidden md:block">
+                    <div class="w-24 h-24 rounded-full bg-red-600/20 border border-red-500/30 flex items-center justify-center animate-bounce">
+                        <i data-lucide="play" class="w-10 h-10 text-red-500 fill-current ml-1"></i>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
     <section class="mb-16" x-data="{ activeTab: 'Manga' }">
-        
         <div class="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
             <h2 class="text-2xl font-bold text-white flex items-center gap-3">
                 <i data-lucide="trophy" class="w-6 h-6 text-yellow-500"></i>
@@ -72,28 +71,13 @@
             </h2>
 
             <div class="flex bg-neutral-900 p-1 rounded-xl border border-white/5">
-                <button @click="activeTab = 'Manga'" 
-                        :class="activeTab === 'Manga' ? 'bg-purple-600 text-white shadow-lg' : 'text-neutral-400 hover:text-white hover:bg-white/5'"
-                        class="px-5 py-2 rounded-lg text-sm font-bold transition-all duration-300">
-                    Manga
-                </button>
-                <button @click="activeTab = 'Manhwa'" 
-                        :class="activeTab === 'Manhwa' ? 'bg-purple-600 text-white shadow-lg' : 'text-neutral-400 hover:text-white hover:bg-white/5'"
-                        class="px-5 py-2 rounded-lg text-sm font-bold transition-all duration-300">
-                    Manhwa
-                </button>
-                <button @click="activeTab = 'Manhua'" 
-                        :class="activeTab === 'Manhua' ? 'bg-purple-600 text-white shadow-lg' : 'text-neutral-400 hover:text-white hover:bg-white/5'"
-                        class="px-5 py-2 rounded-lg text-sm font-bold transition-all duration-300">
-                    Manhua
-                </button>
+                <button @click="activeTab = 'Manga'" :class="activeTab === 'Manga' ? 'bg-purple-600 text-white shadow-lg' : 'text-neutral-400 hover:text-white hover:bg-white/5'" class="px-5 py-2 rounded-lg text-sm font-bold transition-all duration-300">Manga</button>
+                <button @click="activeTab = 'Manhwa'" :class="activeTab === 'Manhwa' ? 'bg-purple-600 text-white shadow-lg' : 'text-neutral-400 hover:text-white hover:bg-white/5'" class="px-5 py-2 rounded-lg text-sm font-bold transition-all duration-300">Manhwa</button>
+                <button @click="activeTab = 'Manhua'" :class="activeTab === 'Manhua' ? 'bg-purple-600 text-white shadow-lg' : 'text-neutral-400 hover:text-white hover:bg-white/5'" class="px-5 py-2 rounded-lg text-sm font-bold transition-all duration-300">Manhua</button>
             </div>
         </div>
 
-        <div x-show="activeTab === 'Manga'" 
-             x-transition:enter="transition ease-out duration-300"
-             x-transition:enter-start="opacity-0 translate-y-2"
-             x-transition:enter-end="opacity-100 translate-y-0">
+        <div x-show="activeTab === 'Manga'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
             @if($manga->count() > 0)
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5">
                     @foreach($manga as $comic)
@@ -101,21 +85,11 @@
                     @endforeach
                 </div>
             @else
-                <div class="py-12 text-center border border-white/5 rounded-2xl bg-neutral-900/50">
-                    <p class="text-neutral-500">Belum ada data Manga.</p>
-                </div>
+                <div class="py-12 text-center border border-white/5 rounded-2xl bg-neutral-900/50"><p class="text-neutral-500">Belum ada data Manga.</p></div>
             @endif
-            <div class="mt-6 text-center">
-                <a href="{{ route('explore.index', ['type' => 'Manga']) }}" class="inline-flex items-center gap-2 text-sm font-bold text-neutral-400 hover:text-white transition-colors">
-                    Lihat Semua Manga <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                </a>
-            </div>
         </div>
 
-        <div x-show="activeTab === 'Manhwa'" style="display: none;"
-             x-transition:enter="transition ease-out duration-300"
-             x-transition:enter-start="opacity-0 translate-y-2"
-             x-transition:enter-end="opacity-100 translate-y-0">
+        <div x-show="activeTab === 'Manhwa'" style="display: none;" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
             @if($manhwa->count() > 0)
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5">
                     @foreach($manhwa as $comic)
@@ -123,21 +97,11 @@
                     @endforeach
                 </div>
             @else
-                <div class="py-12 text-center border border-white/5 rounded-2xl bg-neutral-900/50">
-                    <p class="text-neutral-500">Belum ada data Manhwa.</p>
-                </div>
+                <div class="py-12 text-center border border-white/5 rounded-2xl bg-neutral-900/50"><p class="text-neutral-500">Belum ada data Manhwa.</p></div>
             @endif
-            <div class="mt-6 text-center">
-                <a href="{{ route('explore.index', ['type' => 'Manhwa']) }}" class="inline-flex items-center gap-2 text-sm font-bold text-neutral-400 hover:text-white transition-colors">
-                    Lihat Semua Manhwa <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                </a>
-            </div>
         </div>
 
-        <div x-show="activeTab === 'Manhua'" style="display: none;"
-             x-transition:enter="transition ease-out duration-300"
-             x-transition:enter-start="opacity-0 translate-y-2"
-             x-transition:enter-end="opacity-100 translate-y-0">
+        <div x-show="activeTab === 'Manhua'" style="display: none;" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
             @if($manhua->count() > 0)
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5">
                     @foreach($manhua as $comic)
@@ -145,17 +109,9 @@
                     @endforeach
                 </div>
             @else
-                <div class="py-12 text-center border border-white/5 rounded-2xl bg-neutral-900/50">
-                    <p class="text-neutral-500">Belum ada data Manhua.</p>
-                </div>
+                <div class="py-12 text-center border border-white/5 rounded-2xl bg-neutral-900/50"><p class="text-neutral-500">Belum ada data Manhua.</p></div>
             @endif
-            <div class="mt-6 text-center">
-                <a href="{{ route('explore.index', ['type' => 'Manhua']) }}" class="inline-flex items-center gap-2 text-sm font-bold text-neutral-400 hover:text-white transition-colors">
-                    Lihat Semua Manhua <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                </a>
-            </div>
         </div>
-
     </section>
 
     <div class="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-16"></div>
@@ -166,11 +122,8 @@
                 <div class="p-2 bg-purple-500/10 rounded-lg">
                     <i data-lucide="zap" class="w-6 h-6 text-purple-500"></i>
                 </div>
-                Update Terbaru
+                Baru Saja Update
             </h2>
-            <a href="{{ route('explore.index', ['sort' => 'Terbaru']) }}" class="group flex items-center gap-1 text-sm font-bold text-neutral-500 hover:text-white transition-colors">
-                Lihat Semua Update <i data-lucide="arrow-right" class="w-4 h-4 transition-transform group-hover:translate-x-1"></i>
-            </a>
         </div>
 
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5">
@@ -186,11 +139,33 @@
                 </div>
             @endforelse
         </div>
-        
-        <div class="mt-10 text-center">
-             <a href="{{ route('explore.index') }}" class="px-8 py-3 bg-neutral-800 hover:bg-neutral-700 text-white font-bold rounded-xl border border-white/5 transition-all">
-                Muat Lebih Banyak
+    </section>
+
+    <section class="mb-16">
+        <div class="flex items-center justify-between mb-8">
+            <h2 class="text-2xl md:text-3xl font-bold text-white flex items-center gap-3">
+                <div class="p-2 bg-blue-500/10 rounded-lg">
+                    <i data-lucide="layers" class="w-6 h-6 text-blue-500"></i>
+                </div>
+                Semua Komik
+            </h2>
+            <a href="{{ route('explore.index') }}" class="group flex items-center gap-1 text-sm font-bold text-neutral-500 hover:text-white transition-colors">
+                Lihat Semua <i data-lucide="arrow-right" class="w-4 h-4 transition-transform group-hover:translate-x-1"></i>
             </a>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5">
+            @forelse($allComics as $comic)
+                <x-comic-card-home :comic="$comic" />
+            @empty
+                <div class="col-span-full py-16 text-center bg-neutral-900/50 rounded-3xl border border-white/5">
+                    <p class="text-neutral-500">Belum ada komik.</p>
+                </div>
+            @endforelse
+        </div>
+        
+        <div class="mt-10 flex justify-center">
+            {{ $allComics->links('pagination::tailwind') }}
         </div>
     </section>
 

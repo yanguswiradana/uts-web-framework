@@ -9,22 +9,45 @@ class Chapter extends Model
 {
     use HasFactory;
 
-    // Kita pakai guarded id saja biar tidak perlu tulis satu-satu kolomnya
     protected $guarded = ['id'];
 
     protected $casts = [
-        // MAGIC: Mengubah kolom JSON di database menjadi Array PHP otomatis
         'content_images' => 'array', 
     ];
 
-    // Relasi: Chapter milik 1 Komik
     public function comic()
     {
         return $this->belongsTo(Comic::class);
     }
 
     public function comments()
-{
-    return $this->hasMany(Comment::class)->latest(); // Komen terbaru di atas
-}
+    {
+        return $this->hasMany(Comment::class)->latest();
+    }
+
+    /**
+     * ACCESSOR PENTING:
+     * Ini yang membuat Admin bisa menghitung jumlah halaman dengan benar
+     * meskipun datanya campur-campur (JSON string / Array).
+     */
+    public function getTotalPagesAttribute()
+    {
+        $images = $this->content_images;
+
+        if (is_null($images)) return 0;
+
+        // Jika sudah array, hitung langsung
+        if (is_array($images)) return count($images);
+
+        // Jika string JSON, decode dulu baru hitung
+        if (is_string($images)) {
+            $decoded = json_decode($images, true);
+            if (is_string($decoded)) {
+                $decoded = json_decode($decoded, true);
+            }
+            return is_array($decoded) ? count($decoded) : 0;
+        }
+
+        return 0;
+    }
 }

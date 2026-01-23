@@ -12,21 +12,41 @@ use Illuminate\Support\Str;
 class ChapterController extends Controller
 {
     /**
-     * Tampilkan semua chapter
+     * Tampilkan halaman manajemen chapter
+     * (Dikategorikan per Komik untuk tampilan Accordion)
      */
-    public function index()
+public function index(Request $request)
     {
-        $chapters = Chapter::with('comic')->latest()->paginate(10);
-        return view('admin.chapters.index', compact('chapters'));
-    }
+        // Ambil Data Komik dengan Eager Load Chapters
+        $query = Comic::with(['chapters' => function($q) {
+            $q->orderBy('number', 'desc'); 
+        }])->withCount('chapters');
 
+        // 1. Filter Pencarian Judul
+        if ($request->filled('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%');
+        }
+
+        // 2. Filter Tipe (Manga / Manhwa / Manhua) -> BARU DITAMBAHKAN
+        if ($request->filled('type') && in_array($request->type, ['Manga', 'Manhwa', 'Manhua'])) {
+            $query->where('type', $request->type);
+        }
+
+        // Urutkan & Paginate (gunakan withQueryString agar filter tidak hilang saat ganti halaman)
+        $comics = $query->latest('updated_at')->paginate(10)->withQueryString();
+
+        return view('admin.chapters.index', compact('comics'));
+    }
     /**
      * Form tambah chapter
      */
-    public function create()
+    public function create(Request $request)
     {
+        // Jika ada comic_id di URL (dari tombol "+ Tambah Chapter" di accordion), auto-select
+        $selectedComicId = $request->query('comic_id');
+        
         $comics = Comic::orderBy('title')->get();
-        return view('admin.chapters.create', compact('comics'));
+        return view('admin.chapters.create', compact('comics', 'selectedComicId'));
     }
 
     /**
