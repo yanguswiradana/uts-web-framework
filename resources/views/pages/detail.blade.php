@@ -4,9 +4,14 @@
 
 @section('content')
 
-    <div class="relative bg-neutral-900 border border-white/5 rounded-3xl p-6 md:p-10 mb-10 overflow-hidden shadow-2xl">
+    {{-- FIX 1: Hapus 'overflow-hidden' di sini agar modal tidak kepotong --}}
+    <div class="relative bg-neutral-900 border border-white/5 rounded-3xl p-6 md:p-10 mb-10 shadow-2xl">
         
-        <div class="absolute top-0 right-0 w-96 h-96 bg-purple-600/20 rounded-full blur-[100px] -mr-20 -mt-20 pointer-events-none"></div>
+        {{-- FIX 2: Bungkus Background Blur dalam container khusus yang overflow-hidden --}}
+        {{-- Ini memastikan blur tetap di dalam rounded corner, TAPI modal rating tetap bisa keluar --}}
+        <div class="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
+            <div class="absolute top-0 right-0 w-96 h-96 bg-purple-600/20 rounded-full blur-[100px] -mr-20 -mt-20"></div>
+        </div>
         
         <div class="relative z-10 flex flex-col md:flex-row gap-8 md:gap-12">
             
@@ -56,6 +61,7 @@
                         </p>
                     </div>
                     
+                    {{-- Bagian Rating --}}
                     <div x-data="{ openRating: false }" class="relative">
                         <p class="text-neutral-500 text-xs uppercase font-bold mb-1">Rating</p>
                         <div class="flex items-center gap-1 text-yellow-500 font-bold text-lg cursor-pointer hover:opacity-80 transition-opacity" @click="openRating = !openRating">
@@ -66,11 +72,13 @@
                             @endif
                         </div>
 
+                        {{-- FIX 3: Ubah 'left-0' jadi 'right-0' agar modal muncul ke arah kiri (aman dari layar HP) --}}
+                        {{-- Tambahkan 'origin-top-right' untuk animasi yang pas --}}
                         <div x-show="openRating" @click.outside="openRating = false" 
                              x-transition:enter="transition ease-out duration-100"
                              x-transition:enter-start="opacity-0 scale-95"
                              x-transition:enter-end="opacity-100 scale-100"
-                             class="absolute mt-2 left-0 bg-neutral-900 border border-white/10 rounded-xl p-4 shadow-2xl z-50 w-64 md:w-72"
+                             class="absolute mt-2 right-0 bg-neutral-900 border border-white/10 rounded-xl p-4 shadow-2xl z-50 w-64 md:w-72 origin-top-right"
                              style="display: none;">
                              
                             @auth
